@@ -25,7 +25,7 @@ python main.py
 -
 - Manuel Arnau Fernández -> 1597487@uab.cat
 - Pau Fuentes Hernández -> pau.fuentesh@autonoma.cat
-- Andrea González Aguilera -> andrea.gonzalez@autonoma.cat
+- Andrea González Aguilera -> andrea.gonzaleza@autonoma.cat
 - Xavier Seminario Monllaó -> 1603853@uab.cat
 
 Write here the name and UAB mail of the group members
