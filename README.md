@@ -25,7 +25,7 @@ python main.py
 -
 -
 - Pau Fuentes Hernández -> pau.fuentesh@autonoma.cat
-- Andrea González Aguilera -> gonzalezaguileraandrea4@gmail.com
+- Andrea González Aguilera -> andrea.gonzaleza@uab.cat
 
 Write here the name and UAB mail of the group members
 
