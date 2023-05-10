@@ -24,10 +24,11 @@ python main.py
 ## Contributors
 -
 -
--
+- Pau Fuentes Hernández -> pau.fuentesh@autonoma.cat
 - Andrea González Aguilera -> gonzalezaguileraandrea4@gmail.com
+
 Write here the name and UAB mail of the group members
 
 Xarxes Neuronals i Aprenentatge Profund
-Grau de __Write here the name of your estudies (Artificial Intelligence, Data Engineering or Computational Mathematics & Data analyitics)__, 
+Grau de Computational Mathematics & Data analyitics, 
 UAB, 2023
