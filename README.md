@@ -22,6 +22,10 @@ python main.py
 
 
 ## Contributors
+-
+-
+-
+- Andrea González Aguilera -> gonzalezaguileraandrea4@gmail.com
 Write here the name and UAB mail of the group members
 
 Xarxes Neuronals i Aprenentatge Profund
