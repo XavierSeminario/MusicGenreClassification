@@ -23,7 +23,7 @@ python main.py
 
 ## Contributors
 -
--
+- Manuel Arnau Fernández -> 1597487@uab.cat
 - Pau Fuentes Hernández -> pau.fuentesh@autonoma.cat
 - Andrea González Aguilera -> andrea.gonzaleza@uab.cat
 
