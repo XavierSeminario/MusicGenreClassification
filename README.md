@@ -28,8 +28,6 @@ python main.py
 - Andrea González Aguilera -> andrea.gonzaleza@autonoma.cat
 - Xavier Seminario Monllaó -> 1603853@uab.cat
 
-Write here the name and UAB mail of the group members
-
 Xarxes Neuronals i Aprenentatge Profund
 Grau de Computational Mathematics & Data analyitics, 
 UAB, 2023
