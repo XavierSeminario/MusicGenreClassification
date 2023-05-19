@@ -16,3 +16,8 @@ dependencies:
   - wandb
   - onnxruntime
   - ipykernel
+  - librosa
+  - pandas
+  - ast
+  - keras
+  - seaborn

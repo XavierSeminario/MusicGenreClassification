@@ -16,6 +16,9 @@ conda activate xnap-example
 
 To run the example code:
 ```
+chmod +x Descarregar_Dades.sh
+./Descarregar_Dades.sh
+
 python main.py
 ```
 
