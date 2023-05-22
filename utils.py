@@ -66,10 +66,10 @@ class FreeMusicArchive:
     def get_track(self, track_id, fields=None):
         return self._get_data('track', track_id, fields)
 
-    def get_album(self, album_id, fields=None):
+    def get_album(self, album_id, fields=None): #delete
         return self._get_data('album', album_id, fields)
 
-    def get_artist(self, artist_id, fields=None):
+    def get_artist(self, artist_id, fields=None): #delete
         return self._get_data('artist', artist_id, fields)
 
     def get_all(self, dataset, id_range):
