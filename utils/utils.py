@@ -1,42 +1,92 @@
-import wandb
+import numpy as np
+import pandas as pd
+import os.path
+import ast
+import torchaudio
 import torch
-import torch.nn 
-import torchvision
-import torchvision.transforms as transforms
-from models.models import *
 
-def get_data(slice=1, train=True):
-    full_dataset = torchvision.datasets.MNIST(root=".",
-                                              train=train, 
-                                              transform=transforms.ToTensor(),
-                                              download=True)
-    #  equiv to slicing with [::slice] 
-    sub_dataset = torch.utils.data.Subset(
-      full_dataset, indices=range(0, len(full_dataset), slice))
+# Number of samples per 30s audio clip.
+# TODO: fix dataset to be constant.
+SAMPLING_RATE = 44100
+
+
+
+class Genres:
+
+    def __init__(self, tracks_df):
+        self.df = tracks_df
     
-    return sub_dataset
+    def GetGenres(self, path, genre = 'genre_top'):  #Returns two arrays, one with ID's the other with their genres
+        id_list = []       
+        genre_list = []                                
+        for direc in list(path.iterdir()):
+            if not direc.is_file():
+                for file in (list(direc.iterdir())):
+                    id_track = str(file)[-10:-4]
+                    id_list.append(id_track)
+                    genre_list.append(self.df.loc[self.df.track_id == int(id_track),genre].values[0])
+        return np.asarray(id_list),np.asarray(genre_list)
+
+def load(filepath):
+
+    filename = os.path.basename(filepath)
+
+    if 'features' in filename:
+        return pd.read_csv(filepath, index_col=0, header=[0, 1, 2])
+
+    if 'echonest' in filename:
+        return pd.read_csv(filepath, index_col=0, header=[0, 1, 2])
+
+    if 'genres' in filename:
+        return pd.read_csv(filepath, index_col=0)
+
+    if 'tracks' in filename:
+        tracks = pd.read_csv(filepath, index_col=0, header=[0, 1])
+
+        COLUMNS = [('track', 'tags'), ('album', 'tags'), ('artist', 'tags'),
+                   ('track', 'genres'), ('track', 'genres_all')]
+        for column in COLUMNS:
+            tracks[column] = tracks[column].map(ast.literal_eval)
+
+        COLUMNS = [('track', 'date_created'), ('track', 'date_recorded'),
+                   ('album', 'date_created'), ('album', 'date_released'),
+                   ('artist', 'date_created'), ('artist', 'active_year_begin'),
+                   ('artist', 'active_year_end')]
+        for column in COLUMNS:
+            tracks[column] = pd.to_datetime(tracks[column])
+
+        SUBSETS = ('small', 'medium', 'large')
+        try:
+            tracks['set', 'subset'] = tracks['set', 'subset'].astype(
+                    'category', categories=SUBSETS, ordered=True)
+        except (ValueError, TypeError):
+            # the categories and ordered arguments were removed in pandas 0.25
+            tracks['set', 'subset'] = tracks['set', 'subset'].astype(
+                     pd.CategoricalDtype(categories=SUBSETS, ordered=True))
+
+        COLUMNS = [('track', 'genre_top'), ('track', 'license'),
+                   ('album', 'type'), ('album', 'information'),
+                   ('artist', 'bio')]
+        for column in COLUMNS:
+            tracks[column] = tracks[column].astype('category')
+
+        return tracks
 
 
-def make_loader(dataset, batch_size):
-    loader = torch.utils.data.DataLoader(dataset=dataset,
-                                         batch_size=batch_size, 
-                                         shuffle=True,
-                                         pin_memory=True, num_workers=2)
-    return loader
-
-
-def make(config, device="cuda"):
-    # Make the data
-    train, test = get_data(train=True), get_data(train=False)
-    train_loader = make_loader(train, batch_size=config.batch_size)
-    test_loader = make_loader(test, batch_size=config.batch_size)
-
-    # Make the model
-    model = ConvNet(config.kernels, config.classes).to(device)
-
-    # Make the loss and optimizer
-    criterion = nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(
-        model.parameters(), lr=config.learning_rate)
-    
-    return model, train_loader, test_loader, criterion, optimizer
+def CreateSpectrograms(load_path,save_path, transformation = "MEL"):
+    if transformation == 'MEL':
+        transform = torchaudio.transforms.MelSpectrogram(SAMPLING_RATE,n_fft=2048,hop_length=512)
+    else:
+        transform = torchaudio.transforms.Spectrogram(SAMPLING_RATE,n_fft=2048,hop_length=512)
+    for direc in list(load_path.iterdir()):
+        if not direc.is_file():
+            for file in (list(direc.iterdir())):
+                id_track = str(file)[-10:-4]
+                try:
+                    waveform, sample_rate = torchaudio.load(file)
+                    if waveform.shape[0] > 1:
+                        waveform = (waveform[0] + waveform[1])/2
+                    spec = transform(waveform)
+                    torch.save(spec, save_path+"/"+id_track+".pt")
+                except:
+                    pass
