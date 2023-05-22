@@ -90,3 +90,67 @@ def CreateSpectrograms(load_path,save_path, transformation = "MEL"):
                     torch.save(spec, save_path+"/"+id_track+".pt")
                 except:
                     pass
+
+def ChargeDataset(path,id_list,genre_list):
+    images = []
+    labels = []
+    for spec in list(path.iterdir()):
+        id_track = str(spec)[13:-3]
+        labels.append(genre_list[np.argwhere(id_list == id_track)][0][0])
+        images.append(torch.load(spec))
+    return np.asarray(images),np.asarray(labels)
+
+def plot_spectrogram(spec, title=None, ylabel="freq_bin", aspect="auto", xmax=None):
+    fig, axs = plt.subplots(1, 1)
+    axs.set_title(title or "Spectrogram (db)")
+    axs.set_ylabel(ylabel)
+    axs.set_xlabel("frame")
+    im = axs.imshow(librosa.power_to_db(spec), origin="lower", aspect=aspect)
+    if xmax:
+        axs.set_xlim((0, xmax))
+    fig.colorbar(im, ax=axs)
+    plt.show(block=False)
+
+class CustomSpectrogramDataset(Dataset):
+    def __init__(self, spectrogram,genre, transform=None):
+        self.x = spectrogram
+        self.target = genre
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.target)
+
+    def __getitem__(self, idx):
+        image = self.x[idx]
+        label = self.target[idx]
+        if (self.transform!=None):
+            image = self.transform(image)
+        return image, label
+
+def FixSpectrogramSize(spectrograms,genres,size):
+    spectograms_list = []
+    genres_list = []
+    for i,spec in enumerate(spectograms):
+        if spec.shape == (128,2812):
+            spectograms_list.append(spec[0:128,0:size])
+            genres_list.append(genres[i])
+            
+        elif spec.shape == (1,128,size):
+            spectograms_list.append(spec.reshape(128,size))
+            genres_list.append(genres[i])
+
+        elif spec.shape == (1,128,2585):
+            spec = spec.reshape(128,2585)
+            spectograms_list.append(spec[0:128,0:size])
+            genres_list.append(genres[i])
+
+        elif spec.shape == (128, 2585):
+            spectograms_list.append(spec[0:128,0:size])
+            genres_list.append(genres[i])
+
+        elif spec.shape == (128, size):
+            spectograms_list.append(spec)
+            genres_list.append(genres[i])
+    
+    return spectograms_list, genres_list
+    
