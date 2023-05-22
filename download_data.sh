@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FILE=/home/xnmaster/xnap-project-matcad_grup_11/data
+FILE=./data
 
 if test -d "$FILE"; then
     echo "Data file already exists"
