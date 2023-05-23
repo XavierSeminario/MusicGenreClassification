@@ -27,20 +27,20 @@ class Genres:
                     genre_list.append(self.df.loc[self.df.track_id == int(id_track),genre].values[0])
         return np.asarray(id_list),np.asarray(genre_list)
 
-def load(filepath):
+def load(filepath): #loads CSV file from the specified filepath and performs different operations based on the filename
 
     filename = os.path.basename(filepath)
 
     if 'features' in filename:
         return pd.read_csv(filepath, index_col=0, header=[0, 1, 2])
-
+                                            #if it contains 'features' or 'echonest', it reads the CSV file with specific headers
     if 'echonest' in filename:
         return pd.read_csv(filepath, index_col=0, header=[0, 1, 2])
 
-    if 'genres' in filename:
+    if 'genres' in filename: #if it contains 'genres', it reads the CSV file with a basic index column
         return pd.read_csv(filepath, index_col=0)
 
-    if 'tracks' in filename:
+    if 'tracks' in filename: #if it contains 'tracks', it reads the CSV file with multiple headers and performs additional data transformations before returning the loaded data
         tracks = pd.read_csv(filepath, index_col=0, header=[0, 1])
 
         COLUMNS = [('track', 'tags'), ('album', 'tags'), ('artist', 'tags'),
@@ -73,8 +73,9 @@ def load(filepath):
         return tracks
 
 
-def CreateSpectrograms(load_path,save_path, transformation = "MEL"):
-    if transformation == 'MEL':
+def CreateSpectrograms(load_path,save_path, transformation = "MEL"): #  creates spectrograms from audio files and saves them as Torch tensors 
+    if transformation == 'MEL':                                         # using either MelSpectrogram or Spectrogram transformation (default is MelSpectrogram)
+
         transform = torchaudio.transforms.MelSpectrogram(SAMPLING_RATE,n_fft=2048,hop_length=512)
     else:
         transform = torchaudio.transforms.Spectrogram(SAMPLING_RATE,n_fft=2048,hop_length=512)
@@ -127,7 +128,7 @@ class CustomSpectrogramDataset(Dataset):
             image = self.transform(image)
         return image, label
 
-def FixSpectrogramSize(spectrograms,genres,size):
+def FixSpectrogramSize(spectrograms,genres,size): # reescale or cut spectograms so that they are all the same size
     spectograms_list = []
     genres_list = []
     for i,spec in enumerate(spectograms):
