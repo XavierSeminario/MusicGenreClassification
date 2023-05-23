@@ -1,4 +1,5 @@
 import torch.nn as nn
+import torch.nn.functional as F
 
 # Conventional and convolutional neural network
 
@@ -22,3 +23,27 @@ class ConvNet(nn.Module):
         out = out.reshape(out.size(0), -1)
         out = self.fc(out)
         return out
+    
+
+# Testing CNN 2D
+class CNN(nn.Module):
+    def __init__(self):
+        super(CNN, self).__init__()
+
+        self.layer1 = nn.Sequential(
+            nn.Conv2d(in_channels=1, out_channels=16, kernel_size=5, padding=2),
+            nn.BatchNorm2d(16),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2)
+        )
+
+        self.fc1 = nn.Linear(in_features=1321984, out_features=8)
+
+    def forward(self, x):
+        x = x.unsqueeze(1) #We want only 1 channel as input
+        out = self.layer1(x)
+        out = out.view(out.size(0), -1)
+        out = self.fc1(out)
+        output = F.relu(out)
+
+        return output
