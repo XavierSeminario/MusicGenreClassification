@@ -18,12 +18,11 @@ SAMPLING_RATE = 44100
 def GetGenres(path,dict_genre,tracks ,genre_att = 'genre_top'):  #Returns two arrays, one with ID's the other with their genres
     id_list = []       
     genre_list = []                                
-    for direc in list(path.iterdir()):
-        if not direc.is_file():
-            for file in (list(direc.iterdir())):
-                id_track = str(file)[-10:-4]
-                id_list.append(id_track)
-                genre_list.append(dict_genre[tracks.loc[tracks.track_id == int(id_track),genre_att].values[0]])
+    for file in list(path.iterdir()):
+        if file.suffix == '.mp3':
+            id_track = str(file)[-10:-4]
+            id_list.append(id_track)
+            genre_list.append(dict_genre[tracks.loc[int(id_track),('track', genre_att)]])
     return np.asarray(id_list),np.asarray(genre_list)
 
 def load(filepath): #loads CSV file from the specified filepath and performs different operations based on the filename
@@ -73,17 +72,19 @@ def load(filepath): #loads CSV file from the specified filepath and performs dif
 
 
 def CreateSpectrograms(load_path,save_path, transformation = "MEL"): #  creates spectrograms from audio files and saves them as Torch tensors 
-    if transformation == 'MEL':                                         # using either MelSpectrogram or Spectrogram transformation (default is MelSpectrogram)
+    print(torchaudio.__version__)
 
+    if transformation == 'MEL':                                         # using either MelSpectrogram or Spectrogram transformation (default is MelSpectrogram)
         transform = torchaudio.transforms.MelSpectrogram(SAMPLING_RATE,n_fft=2048,hop_length=512)
+ #SAMPLING_RATE,n_fft=2048,hop_length=512)
     else:
         transform = torchaudio.transforms.Spectrogram(SAMPLING_RATE,n_fft=2048,hop_length=512)
     for file in list(load_path.iterdir()):
         id_track = str(file)[-10:-4]
-        
         try:
-            print(torchaudio.load(file))
-            #waveform, sample_rate = torchaudio.load(file)
+            waveform, sample_rate = torchaudio.load(file, format = "mp3")
+            #waveform, sr = librosa.load(file)
+            #transform = librosa.feature.melspectrogram(y=waveform, sr=sr, n_fft=2048, hop_length=512)
             if waveform.shape[0] > 1:
                     waveform = (waveform[0] + waveform[1])/2
             spec = transform(waveform)
@@ -95,8 +96,12 @@ def CreateSpectrograms(load_path,save_path, transformation = "MEL"): #  creates 
 def ChargeDataset(path,id_list,genre_list):
     images = []
     labels = []
+    #print(genre_list)
     for spec in list(path.iterdir()):
+        #print(spec)
         id_track = str(spec)[13:-3]
+        #print(id_track)
+        #print(genre_list[np.argwhere(id_list == id_track)])
         labels.append(genre_list[np.argwhere(id_list == id_track)][0][0])
         images.append(torch.load(spec))
     return np.asarray(images),np.asarray(labels)
@@ -182,12 +187,12 @@ def FixSizeSpectrogram(spectrograms,genres):
     return spectograms_list, genres_list
 
 def LoadFixCSV():
-    tracks = pd.read_csv("./data/tracks.csv")
-    genres = pd.read_csv("./data/genres.csv")
-    tracks.columns=tracks.iloc[0] 
-    tracks.columns.values[0] = "track_id"
-    tracks.drop([0,1],inplace=True)
-    tracks.track_id = tracks.track_id.astype(int)
+    tracks = load("./data/tracks.csv")
+    genres = load("./data/genres.csv")
+    #tracks.columns=tracks.iloc[0] 
+    #tracks.columns.values[0] = "track_id"
+    #tracks.drop([0,1],inplace=True)
+    #tracks.track_id = tracks.track_id.astype(int)
 
     return tracks,genres
 
@@ -202,6 +207,9 @@ def LoadDataPipeline():
 
     save_path = Path("./data/Spectrograms")
     CreateSpectrograms(path,save_path)
+
+    #print(id_list)
+    #print(genre_list)
 
     spectrograms, genres = ChargeDataset(path,id_list,genre_list)    
     

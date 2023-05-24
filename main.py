@@ -52,6 +52,7 @@ def model_pipeline(cfg:dict) -> None:
 """
 if __name__ == "__main__":
     wandb.login()
+    os.system('./download_data.sh')
 
     spectrograms_list, genres_list = LoadDataPipeline()
 
@@ -72,5 +73,4 @@ if __name__ == "__main__":
        # learning_rate=5e-3,
        # dataset="MNIST",
        # architecture="CNN")
-    os.system('./download_data.sh')
     #model = model_pipeline(config)
