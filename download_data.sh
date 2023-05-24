@@ -1,7 +1,8 @@
 #!/bin/bash
 
 FILE=./data
-
+# download and extract two zip files ("fma_metadata.zip" and "fma_small.zip") from the provided URLs 
+#It checks if a directory named "data" already exists and if not, creates it and performs the download and extraction operations within the "data" directory.
 if test -d "$FILE"; then
     echo "Data file already exists"
 else
