@@ -4,28 +4,27 @@ import os.path
 import ast
 import torchaudio
 import torch
+from pathlib import Path,PureWindowsPath,PurePosixPath
+import matplotlib.pyplot as plt
+import librosa
+from torch.utils.data.dataloader import DataLoader, Dataset
+import tqdm
 
 # Number of samples per 30s audio clip.
-# TODO: fix dataset to be constant.
 SAMPLING_RATE = 44100
 
 
-
-class Genres:
-
-    def __init__(self, tracks_df):
-        self.df = tracks_df
     
-    def GetGenres(self, path, genre = 'genre_top'):  #Returns two arrays, one with ID's the other with their genres
-        id_list = []       
-        genre_list = []                                
-        for direc in list(path.iterdir()):
-            if not direc.is_file():
-                for file in (list(direc.iterdir())):
-                    id_track = str(file)[-10:-4]
-                    id_list.append(id_track)
-                    genre_list.append(self.df.loc[self.df.track_id == int(id_track),genre].values[0])
-        return np.asarray(id_list),np.asarray(genre_list)
+def GetGenres(path,dict_genre,tracks ,genre_att = 'genre_top'):  #Returns two arrays, one with ID's the other with their genres
+    id_list = []       
+    genre_list = []                                
+    for direc in list(path.iterdir()):
+        if not direc.is_file():
+            for file in (list(direc.iterdir())):
+                id_track = str(file)[-10:-4]
+                id_list.append(id_track)
+                genre_list.append(dict_genre[tracks.loc[tracks.track_id == int(id_track),genre_att].values[0]])
+    return np.asarray(id_list),np.asarray(genre_list)
 
 def load(filepath): #loads CSV file from the specified filepath and performs different operations based on the filename
 
@@ -79,18 +78,19 @@ def CreateSpectrograms(load_path,save_path, transformation = "MEL"): #  creates 
         transform = torchaudio.transforms.MelSpectrogram(SAMPLING_RATE,n_fft=2048,hop_length=512)
     else:
         transform = torchaudio.transforms.Spectrogram(SAMPLING_RATE,n_fft=2048,hop_length=512)
-    for direc in list(load_path.iterdir()):
-        if not direc.is_file():
-            for file in (list(direc.iterdir())):
-                id_track = str(file)[-10:-4]
-                try:
-                    waveform, sample_rate = torchaudio.load(file)
-                    if waveform.shape[0] > 1:
-                        waveform = (waveform[0] + waveform[1])/2
-                    spec = transform(waveform)
-                    torch.save(spec, save_path+"/"+id_track+".pt")
-                except:
-                    pass
+    for file in list(load_path.iterdir()):
+        id_track = str(file)[-10:-4]
+        
+        try:
+            print(torchaudio.load(file))
+            #waveform, sample_rate = torchaudio.load(file)
+            if waveform.shape[0] > 1:
+                    waveform = (waveform[0] + waveform[1])/2
+            spec = transform(waveform)
+            torch.save(spec, str(save_path)+"/"+id_track+".pt")
+            
+        except:
+            pass
 
 def ChargeDataset(path,id_list,genre_list):
     images = []
@@ -110,7 +110,7 @@ def plot_spectrogram(spec, title=None, ylabel="freq_bin", aspect="auto", xmax=No
     if xmax:
         axs.set_xlim((0, xmax))
     fig.colorbar(im, ax=axs)
-    plt.show(block=False)
+   # plt.show(block=False)
 
 class CustomSpectrogramDataset(Dataset):
     def __init__(self, spectrogram,genre, transform=None):
@@ -131,7 +131,7 @@ class CustomSpectrogramDataset(Dataset):
 def FixSpectrogramSize(spectrograms,genres,size): # reescale or cut spectograms so that they are all the same size
     spectograms_list = []
     genres_list = []
-    for i,spec in enumerate(spectograms):
+    for i,spec in enumerate(spectrograms):
         if spec.shape == (128,2812):
             spectograms_list.append(spec[0:128,0:size])
             genres_list.append(genres[i])
@@ -154,4 +154,64 @@ def FixSpectrogramSize(spectrograms,genres,size): # reescale or cut spectograms 
             genres_list.append(genres[i])
     
     return spectograms_list, genres_list
+
+def FixSizeSpectrogram(spectrograms,genres):
+    spectograms_list = []
+    genres_list = []
+    for i,spec in enumerate(spectrograms):
+        if spec.shape == (128,2812):
+            spectograms_list.append(spec[0:128,0:2582])
+            genres_list.append(genres[i])
+            
+        elif spec.shape == (1,128,2582):
+            spectograms_list.append(spec.reshape(128,2582))
+            genres_list.append(genres[i])
+
+        elif spec.shape == (1,128,2585):
+            spec = spec.reshape(128,2585)
+            spectograms_list.append(spec[0:128,0:2582])
+            genres_list.append(genres[i])
+
+        elif spec.shape == (128, 2585):
+            spectograms_list.append(spec[0:128,0:2582])
+            genres_list.append(genres[i])
+
+        elif spec.shape == (128, 2582):
+            spectograms_list.append(spec)
+            genres_list.append(genres[i])
+    return spectograms_list, genres_list
+
+def LoadFixCSV():
+    tracks = pd.read_csv("./data/tracks.csv")
+    genres = pd.read_csv("./data/genres.csv")
+    tracks.columns=tracks.iloc[0] 
+    tracks.columns.values[0] = "track_id"
+    tracks.drop([0,1],inplace=True)
+    tracks.track_id = tracks.track_id.astype(int)
+
+    return tracks,genres
+
+def LoadDataPipeline():
     
+    tracks, genres = LoadFixCSV()
+    genre_dict = {'Electronic':0,'Experimental':1,'Folk':2,'Hip-Hop':3,
+             'Instrumental':4, 'International':5, 'Pop':6, 'Rock':7}
+
+    path = Path("./data/audio")
+    id_list, genre_list = GetGenres(path,genre_dict,tracks)
+
+    save_path = Path("./data/Spectrograms")
+    CreateSpectrograms(path,save_path)
+
+    spectrograms, genres = ChargeDataset(path,id_list,genre_list)    
+    
+    spectrograms_list, genres_list = FixSizeSpectrogram(spectrograms,genres)
+    
+    return spectrograms_list, genres_list
+
+def CreateTrainTestLoaders(spectrograms_list, genres_list, train_kwargs):
+    #Faltaria afegir split de test i train 
+    train_ds = CustomSpectrogramDataset(spectrograms_list, genres_list)
+    train_dataloader = torch.utils.data.DataLoader(train_ds, **train_kwargs)
+    
+    return train_dataloader #i tambe el test_dataloader

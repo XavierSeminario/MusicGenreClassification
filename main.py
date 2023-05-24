@@ -8,10 +8,11 @@ import torch.nn as nn
 import torchvision
 import torchvision.transforms as transforms
 
-#from train import *
+from train import *
 from test import *
 from utils.utils import *
 from tqdm.auto import tqdm
+from models.models import *
 
 # Ensure deterministic behavior
 torch.backends.cudnn.deterministic = True
@@ -23,9 +24,11 @@ torch.cuda.manual_seed_all(hash("so runs are repeatable") % 2**32 - 1)
 # Device configuration
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-# remove slow mirror from list of MNIST mirrors
-torchvision.datasets.MNIST.mirrors = [mirror for mirror in torchvision.datasets.MNIST.mirrors
-                                      if not mirror.startswith("http://yann.lecun.com")]
+epochs = 30
+batch_size = 15        # number of samples during training
+test_batch_size = 1500  # number of samples for test 
+
+train_kwargs = {'batch_size': batch_size}
 
 
 
@@ -50,13 +53,24 @@ def model_pipeline(cfg:dict) -> None:
 if __name__ == "__main__":
     wandb.login()
 
-    config = dict(
-        epochs=5,
-        classes=10,
-        kernels=[16, 32],
-        batch_size=128,
-        learning_rate=5e-3,
-        dataset="MNIST",
-        architecture="CNN")
+    spectrograms_list, genres_list = LoadDataPipeline()
+
+    train_dataloader = CreateTrainTestLoaders(spectrograms_list, genres_list, train_kwargs)
+    model = CNN()
+    loss = nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    #Scheduler that will modify the learning ratio dinamically according to the test loss
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer)
+
+    for epoch in range(1, epochs + 1):
+        loss_train_epoch = train(model, device, train_dataloader, optimizer, loss)
+    #config = dict(
+     #   epochs=5,
+      #  classes=10,
+       # kernels=[16, 32],
+       # batch_size=128,
+       # learning_rate=5e-3,
+       # dataset="MNIST",
+       # architecture="CNN")
     os.system('./download_data.sh')
     #model = model_pipeline(config)
