@@ -62,7 +62,7 @@ if __name__ == "__main__":
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     #Scheduler that will modify the learning ratio dinamically according to the test loss
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer)
-
+    model.to(device)
     for epoch in range(1, epochs + 1):
         loss_train_epoch = train(model, device, train_dataloader, optimizer, loss)
     #config = dict(

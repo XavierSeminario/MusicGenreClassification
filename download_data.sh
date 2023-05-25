@@ -15,6 +15,7 @@ else
     7z e fma_metadata.zip
 
     mkdir audio
+    mkdir Spectrograms
     cd audio
 
     curl -O https://os.unil.cloud.switch.ch/fma/fma_small.zip

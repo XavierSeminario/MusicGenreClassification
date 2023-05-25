@@ -99,12 +99,13 @@ def ChargeDataset(path,id_list,genre_list):
     #print(genre_list)
     for spec in list(path.iterdir()):
         #print(spec)
-        id_track = str(spec)[13:-3]
+        id_track = str(spec)[18:-3]
         #print(id_track)
         #print(genre_list[np.argwhere(id_list == id_track)])
         labels.append(genre_list[np.argwhere(id_list == id_track)][0][0])
         images.append(torch.load(spec))
-    return np.asarray(images),np.asarray(labels)
+    
+    return images,labels
 
 def plot_spectrogram(spec, title=None, ylabel="freq_bin", aspect="auto", xmax=None):
     fig, axs = plt.subplots(1, 1)
@@ -205,11 +206,8 @@ def LoadDataPipeline():
     path = Path("./data/audio")
     id_list, genre_list = GetGenres(path,genre_dict,tracks)
 
-    save_path = Path("./data/Spectrograms")
-    CreateSpectrograms(path,save_path)
-
-    #print(id_list)
-    #print(genre_list)
+    path = Path("./data/Spectrograms")
+    #CreateSpectrograms(path,save_path)
 
     spectrograms, genres = ChargeDataset(path,id_list,genre_list)    
     
