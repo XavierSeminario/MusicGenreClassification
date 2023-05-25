@@ -2,6 +2,10 @@
 [![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-718a45dd9cf7e7f842a935f5ebbe5719a5e09af4491e668f4dbf3b35d5cca122.svg)](https://classroom.github.com/online_ide?assignment_repo_id=11101312&assignment_repo_type=AssignmentRepo)
 # XNAP-Project title (replace it by the title of your project)
 You must have installed 7zip on your computer
+Objective: Classify music in 163 genres, either based on pre-extracted features, or by analysing tracks from mp3 samples
+Type of Model: CNN
+Task: Audio Classification
+Data: Metadata and extracted features (342MB), 8,000 tracks in 8 genres (7 GB)
 Write here a short summary about your project. The text must include a short introduction and the targeted goals
 
 ## Code structure
