@@ -8,7 +8,7 @@ class ConvNet(nn.Module):
         super(ConvNet, self).__init__()
         
         self.layer1 = nn.Sequential(
-            nn.Conv2d(1, kernels[0], kernel_size=5, stride=1, padding=2),
+            nn.Conv2d(64, kernels[0], kernel_size=5, stride=1, padding=2),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2))
         self.layer2 = nn.Sequential(
@@ -37,7 +37,7 @@ class CNN(nn.Module):
             nn.MaxPool2d(kernel_size=2, stride=2)
         )
 
-        self.fc1 = nn.Linear(in_features=1321984, out_features=8)
+        self.fc1 = nn.Linear(in_features=16384, out_features=8)
 
     def forward(self, x):
         x = x.unsqueeze(1) #We want only 1 channel as input
@@ -47,3 +47,13 @@ class CNN(nn.Module):
         output = F.relu(out)
 
         return output
+
+"""
+class CNNGH(nn.Module):
+    def __init__(self, image_size):
+        super(CNNGH, self).__init__()
+
+        self.layer1 = nn.Sequential(
+            nn.Conv1d(in_channels=1, )
+        )
+"""
