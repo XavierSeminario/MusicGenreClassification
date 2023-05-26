@@ -37,7 +37,7 @@ class CNN(nn.Module):
             nn.MaxPool2d(kernel_size=2, stride=2)
         )
 
-        self.fc1 = nn.Linear(in_features=16384, out_features=8)
+        self.fc1 = nn.Linear(in_features=1321984, out_features=8)
 
     def forward(self, x):
         x = x.unsqueeze(1) #We want only 1 channel as input
@@ -48,12 +48,34 @@ class CNN(nn.Module):
 
         return output
 
-"""
+
 class CNNGH(nn.Module):
-    def __init__(self, image_size):
+    def __init__(self):
         super(CNNGH, self).__init__()
 
         self.layer1 = nn.Sequential(
-            nn.Conv1d(in_channels=1, )
+            nn.Conv2d(in_channels=1,out_channels=64, kernel_size=(5)),
+            nn.ReLU(inplace=True),
+            nn.BatchNorm2d(64),
+            nn.MaxPool2d(2)
         )
-"""
+        self.layer2 = nn.Sequential(
+            nn.Conv2d(in_channels=64, out_channels=128, kernel_size=(5)),
+            nn.ReLU(inplace=True),
+            nn.BatchNorm2d(128),
+            nn.MaxPool2d(2)
+        )
+        self.fc1 = nn.Linear(in_features=642,out_features=64)
+        self.fc2 = nn.Linear(in_features=64, out_features=8)
+    
+    def forward(self, x):
+        x = x.unsqueeze(1)
+        out = self.layer1(x)
+        out = self.layer2(out)
+        out = self.fc1(out)
+        out = F.relu(out)
+        out = self.fc2(out)
+        out = F.relu(out)
+        return out.view(out.size(0), -1)
+
+

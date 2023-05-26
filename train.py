@@ -9,7 +9,7 @@ def train(model, device, train_loader, optimizer, criterion):
     for batch_idx, (data, target) in t:
         data, target = data.to(device), target.to(device)
         optimizer.zero_grad() #backpropagation
-        data = data.resize_(data.size()[0], 64,64).float()
+        #data = data.resize_(data.size()[0], 64,64).float()
         output = model(data)
         #print(output, target)
         loss = criterion(output, target)
