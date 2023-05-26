@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import librosa
 from torch.utils.data.dataloader import DataLoader, Dataset
 import tqdm
+from sklearn.model_selection import train_test_split
 
 # Number of samples per 30s audio clip.
 SAMPLING_RATE = 44100
@@ -93,7 +94,7 @@ def CreateSpectrograms(load_path,save_path, transformation = "MEL"): #  creates 
 def ChargeDataset(path,id_list,genre_list):
     images = []
     labels = []
-    for spec in list(path.iterdir()):
+    for i,spec in enumerate(list(path.iterdir())):
         id_track = str(spec)[18:-3]
         labels.append(genre_list[np.argwhere(id_list == id_track)][0][0])
         
@@ -185,17 +186,25 @@ def LoadFixCSV():
 
     return tracks,genres
 
-def CreateTrainTestLoaders(spectrograms_list, genres_list, train_kwargs):
+def CreateTrainTestLoaders(spectrograms_list, genres_list, train_size, train_kwargs, test_kwargs):
     #Faltaria afegir split de test i train 
-    train_ds = CustomSpectrogramDataset(spectrograms_list, genres_list)
+    X_train, X_val, y_train, y_val = train_test_split(spectrograms_list, genres_list, train_size=train_size, stratify=genres_list)
+
+    train_ds = CustomSpectrogramDataset(X_train, y_train)
+    test_ds = CustomSpectrogramDataset(X_val, y_val)
+
     train_dataloader = torch.utils.data.DataLoader(train_ds, **train_kwargs)
-    
-    return train_dataloader #i tambe el test_dataloader
+    test_dataloader = torch.utils.data.DataLoader(test_ds, **test_kwargs)
+
+
+    return train_dataloader, test_dataloader #i tambe el test_dataloader
 
 
 def LoadDataPipeline():
     
+
     tracks, genres = LoadFixCSV()
+    print("Tracks and Genres loaded")
     genre_dict = {'Electronic':0,'Experimental':1,'Folk':2,'Hip-Hop':3,
              'Instrumental':4, 'International':5, 'Pop':6, 'Rock':7}
 
@@ -204,8 +213,9 @@ def LoadDataPipeline():
     save_path = Path("./data/Spectrograms")
     if len(list(save_path.iterdir())) != 7994:
         CreateSpectrograms(path,save_path)
-    
+    print("Spectrograms created")
     spectrograms, genres = ChargeDataset(save_path,id_list,genre_list)
+    print("Spectrograms loaded")
 
     shape = []
     for i in spectrograms:
@@ -215,7 +225,7 @@ def LoadDataPipeline():
 
 
     spectrograms_list, genres_list = FixSizeSpectrogram(spectrograms,genres,shapes)
-    
+    print("Size fixed for Spectrograms")
 
 
     return spectrograms_list, genres_list
