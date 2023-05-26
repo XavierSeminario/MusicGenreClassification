@@ -10,6 +10,7 @@ import librosa
 from torch.utils.data.dataloader import DataLoader, Dataset
 import tqdm
 from sklearn.model_selection import train_test_split
+from torchvision import transforms
 
 # Number of samples per 30s audio clip.
 SAMPLING_RATE = 44100
@@ -188,6 +189,13 @@ def LoadFixCSV():
 
 def CreateTrainTestLoaders(spectrograms_list, genres_list, train_size, train_kwargs, test_kwargs):
     #Faltaria afegir split de test i train 
+    train_mean = np.mean(spectrograms_list)/255. #Mean of all images
+    train_std = np.std(spectrograms_list)/255. 
+    
+    #transform = transforms.Compose([
+        #transforms.Normalize((train_mean,), (train_std,))
+        #])
+
     X_train, X_val, y_train, y_val = train_test_split(spectrograms_list, genres_list, train_size=train_size, stratify=genres_list)
 
     train_ds = CustomSpectrogramDataset(X_train, y_train)
@@ -197,7 +205,7 @@ def CreateTrainTestLoaders(spectrograms_list, genres_list, train_size, train_kwa
     test_dataloader = torch.utils.data.DataLoader(test_ds, **test_kwargs)
 
 
-    return train_dataloader, test_dataloader #i tambe el test_dataloader
+    return train_dataloader, test_dataloader, y_val #i tambe el test_dataloader
 
 
 def LoadDataPipeline():

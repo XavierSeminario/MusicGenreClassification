@@ -7,7 +7,8 @@ import torch
 def test(model, device, test_loader, criterion):
     losses = []
     model.eval()
-    prediction = []
+    all_preds = []
+    
     t = tqdm.tqdm(enumerate(test_loader), total=len(test_loader))
     t.set_description('Test')
     with torch.no_grad():
@@ -19,7 +20,7 @@ def test(model, device, test_loader, criterion):
             loss = criterion(output, target)
             losses.append(loss.item())
             t.set_postfix(loss=loss.item())
-            prediction.append(predicted)
+            all_preds.extend(predicted.detach().cpu().numpy())
             total += target.size(0)
             correct += (predicted == target).sum().item()
 
@@ -27,4 +28,4 @@ def test(model, device, test_loader, criterion):
               f"test images: {correct / total:%}")
         
         wandb.log({"test_accuracy": correct / total})
-    return np.mean(losses), prediction
+    return np.mean(losses), all_preds

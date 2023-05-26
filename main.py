@@ -24,8 +24,8 @@ torch.cuda.manual_seed_all(hash("so runs are repeatable") % 2**32 - 1)
 # Device configuration
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-epochs = 30
-batch_size = 50        # number of samples during training
+epochs = 50
+batch_size = 100        # number of samples during training
 test_batch_size = 50  # number of samples for test 
 train_size = 0.8
 
@@ -59,12 +59,13 @@ if __name__ == "__main__":
 
         spectrograms_list, genres_list = LoadDataPipeline()
 
-        train_dataloader,test_dataloader = CreateTrainTestLoaders(spectrograms_list, genres_list, train_size, 
+        
+        train_dataloader,test_dataloader, targets = CreateTrainTestLoaders(spectrograms_list, genres_list, train_size, 
                                                                 train_kwargs, test_kwargs)
         
-        print(test_dataloader)
         print("Creacion Modelo")
-        model = CNNGH()
+        model = CNNGH1D()
+        model.apply(init_weights)
         loss = nn.CrossEntropyLoss()
         optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
         #Scheduler that will modify the learning ratio dinamically according to the test loss
@@ -75,6 +76,7 @@ if __name__ == "__main__":
         for epoch in range(1, epochs + 1):
             loss_train_epoch = train(model, device, train_dataloader, optimizer, loss, epoch)
             loss_test_epoch, prediction = test(model, device, test_dataloader, loss)
+            
         #config = dict(
         #   epochs=5,
         #  classes=10,

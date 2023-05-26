@@ -107,26 +107,80 @@ class CNNGH(nn.Module):
             super(CNNGH, self).__init__()
             self.name="CNNGH"
             self.layer1 = nn.Sequential(
-                nn.Conv2d(in_channels=1,out_channels=64, kernel_size=(5)),
+                nn.Conv2d(in_channels=1,out_channels=16, kernel_size=(5),stride=2),
+                nn.Dropout(0.5),
                 nn.ReLU(inplace=True),
-                nn.BatchNorm2d(64),
+                nn.BatchNorm2d(16),
                 nn.MaxPool2d(2)
             )
             self.layer2 = nn.Sequential(
-                nn.Conv2d(in_channels=64, out_channels=128, kernel_size=(5)),
+                nn.Conv2d(in_channels=16, out_channels=32, kernel_size=(5),stride=2),
+                nn.Dropout(0.5),
                 nn.ReLU(inplace=True),
-                nn.BatchNorm2d(128),
+                nn.BatchNorm2d(32),
                 nn.MaxPool2d(2)
             )
-            self.fc1 = nn.Linear(in_features=642,out_features=64)
-            self.fc2 = nn.Linear(in_features=64, out_features=8)
+            self.fc1 = nn.Linear(in_features=17696,out_features=200)
+            self.drop = nn.Dropout(0.25)
+            self.fc2 = nn.Linear(in_features=200, out_features=8)
         
         def forward(self, x):
             x = x.unsqueeze(1)
             out = self.layer1(x)
             out = self.layer2(out)
+            out = out.view(out.size(0), -1)
             out = self.fc1(out)
+            out = self.drop(out)
             out = F.relu(out)
             out = self.fc2(out)
             out = F.relu(out)
-            return out.view(out.size(0), -1)
+            return out
+        
+
+class CNNGH1D(nn.Module):
+        def __init__(self):
+            super(CNNGH1D, self).__init__()
+            self.name="CNNGH1D"
+            self.layer1 = nn.Sequential(
+                nn.Conv1d(in_channels=128,out_channels=128, kernel_size=4),
+                nn.ReLU(inplace=True),
+                nn.Dropout(0.25),
+                nn.BatchNorm1d(128),
+                nn.MaxPool1d(4)
+            )
+            self.layer2 = nn.Sequential(
+                nn.Conv1d(in_channels=128, out_channels=128, kernel_size=4),
+                nn.ReLU(inplace=True),
+                nn.Dropout(0.25),
+                nn.BatchNorm1d(128),
+                nn.MaxPool1d(4)
+            )
+            self.layer3 = nn.Sequential(
+                nn.Conv1d(in_channels=128, out_channels=128, kernel_size=4),
+                nn.ReLU(inplace=True),
+                nn.Dropout(0.25),
+                nn.BatchNorm1d(128),
+                nn.MaxPool1d(2)
+            )
+
+            self.fc1 = nn.Linear(in_features=4864 ,out_features=8)
+            self.dropout = nn.Dropout(0.3)
+            
+                
+        def forward(self, x):
+            #x = x.reshape(100,128,1291)
+            out = self.layer1(x)
+            out = self.layer2(out)
+            out = self.layer3(out)
+            out = out.view(out.size(0), -1)
+            out = self.fc1(out)
+            out = F.relu(out)
+            out = self.dropout(out)
+            return out
+        
+def init_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.Linear) or isinstance(m, nn.Conv1d):
+                nn.init.kaiming_uniform_(m.weight, a=0, mode='fan_in', nonlinearity='leaky_relu')
+                if m.bias is not None:
+                    nn.init.zeros_(m.bias)
