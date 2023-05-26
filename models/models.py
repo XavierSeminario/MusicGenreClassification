@@ -17,7 +17,16 @@ class ConvNet(nn.Module):
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2))
         self.fc = nn.Linear(7 * 7 * kernels[-1], classes)
-        
+    
+    def _init_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.Linear) or isinstance(m, nn.Conv2d):
+                nn.init.kaiming_uniform_(m.weight, a=0, mode='fan_in', nonlinearity='leaky_relu')
+                if m.bias is not None:
+                    nn.init.zeros_(m.bias)
+
+
+
     def forward(self, x):
         out = self.layer1(x)
         out = self.layer2(out)
@@ -41,6 +50,12 @@ class CNN(nn.Module):
         self.fc1 = nn.Linear(in_features=1321984, out_features=8)
         self.fc2 = nn.Linear(in_features=1321984, out_features=8)
 
+    def _init_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.Linear) or isinstance(m, nn.Conv2d):
+                nn.init.kaiming_uniform_(m.weight, a=0, mode='fan_in', nonlinearity='leaky_relu')
+                if m.bias is not None:
+                    nn.init.zeros_(m.bias)
 
     def forward(self, x):
         x = x.unsqueeze(1) #We want only 1 channel as input
@@ -86,6 +101,13 @@ class CNN2(nn.Module):
 
         self.dropout = nn.Dropout(p=0.3, inplace=False)
 
+    def _init_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.Linear) or isinstance(m, nn.Conv2d):
+                nn.init.kaiming_uniform_(m.weight, a=0, mode='fan_in', nonlinearity='leaky_relu')
+                if m.bias is not None:
+                    nn.init.zeros_(m.bias)
+
 
     def forward(self, x):
         x = x.unsqueeze(1) #We want only 1 channel as input
@@ -120,10 +142,17 @@ class CNNGH(nn.Module):
                 nn.BatchNorm2d(32),
                 nn.MaxPool2d(2)
             )
-            self.fc1 = nn.Linear(in_features=17696,out_features=200)
-            self.drop = nn.Dropout(0.25)
-            self.fc2 = nn.Linear(in_features=200, out_features=8)
-        
+            self.fc1 = nn.Linear(in_features=642,out_features=64)
+            self.fc2 = nn.Linear(in_features=64, out_features=8)
+
+        def _init_weights(self):
+            for m in self.modules():
+                if isinstance(m, nn.Linear) or isinstance(m, nn.Conv2d):
+                    nn.init.kaiming_uniform_(m.weight, a=0, mode='fan_in', nonlinearity='leaky_relu')
+                    if m.bias is not None:
+                        nn.init.zeros_(m.bias)
+
+
         def forward(self, x):
             x = x.unsqueeze(1)
             out = self.layer1(x)
