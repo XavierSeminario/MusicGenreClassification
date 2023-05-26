@@ -25,7 +25,7 @@ torch.cuda.manual_seed_all(hash("so runs are repeatable") % 2**32 - 1)
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 epochs = 30
-batch_size = 15        # number of samples during training
+batch_size = 150        # number of samples during training
 test_batch_size = 1500  # number of samples for test 
 
 train_kwargs = {'batch_size': batch_size}
@@ -51,6 +51,8 @@ def model_pipeline(cfg:dict) -> None:
     return model
 """
 if __name__ == "__main__":
+    os.system('./download_data.sh')
+
     wandb.login()
 
     spectrograms_list, genres_list = LoadDataPipeline()
@@ -61,7 +63,7 @@ if __name__ == "__main__":
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     #Scheduler that will modify the learning ratio dinamically according to the test loss
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer)
-
+    model.to(device)
     for epoch in range(1, epochs + 1):
         loss_train_epoch = train(model, device, train_dataloader, optimizer, loss)
     #config = dict(
@@ -72,5 +74,4 @@ if __name__ == "__main__":
        # learning_rate=5e-3,
        # dataset="MNIST",
        # architecture="CNN")
-    os.system('./download_data.sh')
     #model = model_pipeline(config)
