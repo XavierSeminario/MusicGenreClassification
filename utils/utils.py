@@ -1,8 +1,6 @@
 import numpy as np
 import pandas as pd
 import os.path
-import ast
-import torchaudio
 import torch
 from pathlib import Path,PureWindowsPath,PurePosixPath
 import matplotlib.pyplot as plt
@@ -10,7 +8,8 @@ import librosa
 from torch.utils.data.dataloader import DataLoader, Dataset
 import tqdm
 from sklearn.model_selection import train_test_split
-from torchvision import transforms
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
 
 # Number of samples per 30s audio clip.
 SAMPLING_RATE = 44100
@@ -237,3 +236,13 @@ def LoadDataPipeline():
 
 
     return spectrograms_list, genres_list
+
+def visualize_confusion_matrix(y_pred, y_real):
+    #mostra la matriu de confusió
+    cm = confusion_matrix(y_real, y_pred)
+    plt.subplots(figsize=(10, 6))
+    sns.heatmap(cm, annot = True, fmt = 'g')
+    plt.xlabel("Predicted")
+    plt.ylabel("Actual")
+    plt.title("Confusion Matrix")
+    plt.show()
