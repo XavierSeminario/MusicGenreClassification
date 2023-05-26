@@ -28,4 +28,6 @@ def test(model, device, test_loader, criterion):
               f"test images: {correct / total:%}")
         
         wandb.log({"test_accuracy": correct / total})
+        
+
     return np.mean(losses), all_preds

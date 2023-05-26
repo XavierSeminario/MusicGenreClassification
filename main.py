@@ -24,7 +24,7 @@ torch.cuda.manual_seed_all(hash("so runs are repeatable") % 2**32 - 1)
 # Device configuration
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-epochs = 500
+epochs = 50
 batch_size = 100        # number of samples during training
 test_batch_size = 50  # number of samples for test 
 train_size = 0.8
@@ -76,7 +76,11 @@ if __name__ == "__main__":
         for epoch in range(1, epochs + 1):
             loss_train_epoch = train(model, device, train_dataloader, optimizer, loss, epoch)
             loss_test_epoch, prediction = test(model, device, test_dataloader, loss)
-
+        class_names =['Electronic','Experimental','Folk','Hip-Hop',
+             'Instrumental', 'International', 'Pop', 'Rock']
+        
+        wandb.log({"conf_mat" : wandb.plot.confusion_matrix(preds=prediction,
+                        y_true=targets,class_names=class_names)})
         PATH="./modelsguardats/" + model.name
         torch.save(model.state_dict(), PATH)
         #config = dict(
