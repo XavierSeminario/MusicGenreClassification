@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 import os.path
 import ast
-import torchaudio
 import torch
 from pathlib import Path,PureWindowsPath,PurePosixPath
 import matplotlib.pyplot as plt
@@ -11,7 +10,7 @@ from torch.utils.data.dataloader import DataLoader, Dataset
 import tqdm
 from sklearn.model_selection import train_test_split
 from torchvision import transforms
-
+import random
 # Number of samples per 30s audio clip.
 SAMPLING_RATE = 44100
 
@@ -163,9 +162,6 @@ def FixSpectrogramSize(spectrograms,genres,size): # reescale or cut spectograms 
 def FixSizeSpectrogram(spectrograms,genres,shapes):
     spectograms_list = []
     genres_list = []
-    height = shapes[0]
-
-
 
     for i,spec in enumerate(spectrograms):
         if spec.shape != (shapes[0],shapes[1]):
@@ -187,17 +183,15 @@ def LoadFixCSV():
 
     return tracks,genres
 
-def CreateTrainTestLoaders(spectrograms_list, genres_list, train_size, train_kwargs, test_kwargs):
+def CreateTrainTestLoaders(spectrograms_list, genres_list, train_size, train_kwargs, test_kwargs, dataaugment = False):
     #Faltaria afegir split de test i train 
-    train_mean = np.mean(spectrograms_list)/255. #Mean of all images
-    train_std = np.std(spectrograms_list)/255. 
     
-    #transform = transforms.Compose([
-        #transforms.Normalize((train_mean,), (train_std,))
-        #])
-
     X_train, X_val, y_train, y_val = train_test_split(spectrograms_list, genres_list, train_size=train_size, stratify=genres_list)
+    
+    if dataaugment:
+        X_train, y_train = DataSpecAugmentation(X_train, y_train)
 
+    print(len(X_train),len(y_train))
     train_ds = CustomSpectrogramDataset(X_train, y_train)
     test_ds = CustomSpectrogramDataset(X_val, y_val)
 
@@ -237,3 +231,41 @@ def LoadDataPipeline():
 
 
     return spectrograms_list, genres_list
+
+
+def DataSpecAugmentation(spec_list, genres_list):
+    spec_augment = []
+    genre_augment = []
+
+    for i,spec in enumerate(spec_list):
+        print(spec)
+        spec = spec_augment(spec)
+        spec_augment.append(spec)
+        genre_augment.append(genres_list[i])
+
+    return spec_list.extend(spec_augment), genres_list.extend(genre_augment)
+
+
+
+#https://www.kaggle.com/code/davids1992/specaugment-quick-implementation
+def spec_augment(spec: np.ndarray, num_mask=2, 
+                 freq_masking_max_percentage=0.15, time_masking_max_percentage=0.25):
+
+    spec = spec.copy()
+    for i in range(num_mask):
+        all_frames_num, all_freqs_num = spec.shape
+        freq_percentage = random.uniform(0.0, freq_masking_max_percentage)
+        
+        num_freqs_to_mask = int(freq_percentage * all_freqs_num)
+        f0 = np.random.uniform(low=0.0, high=all_freqs_num - num_freqs_to_mask)
+        f0 = int(f0)
+        spec[:, f0:f0 + num_freqs_to_mask] = 0
+
+        time_percentage = random.uniform(0.0, time_masking_max_percentage)
+        
+        num_frames_to_mask = int(time_percentage * all_frames_num)
+        t0 = np.random.uniform(low=0.0, high=all_frames_num - num_frames_to_mask)
+        t0 = int(t0)
+        spec[t0:t0 + num_frames_to_mask, :] = 0
+    
+    return spec
