@@ -20,7 +20,7 @@ class ConvNet(nn.Module):
     
     def _init_weights(self):
         for m in self.modules():
-            if isinstance(m, nn.Linear):
+            if isinstance(m, (nn.Linear,nn.Conv2d)):
                 nn.init.kaiming_uniform_(m.weight, a=0, mode='fan_in', nonlinearity='leaky_relu')
                 if m.bias is not None:
                     nn.init.zeros_(m.bias)
@@ -51,7 +51,7 @@ class CNN(nn.Module):
 
     def _init_weights(self):
         for m in self.modules():
-            if isinstance(m, nn.Linear):
+            if isinstance(m, (nn.Linear,nn.Conv2d)):
                 nn.init.kaiming_uniform_(m.weight, a=0, mode='fan_in', nonlinearity='leaky_relu')
                 if m.bias is not None:
                     nn.init.zeros_(m.bias)
@@ -102,7 +102,7 @@ class CNN2(nn.Module):
 
     def _init_weights(self):
         for m in self.modules():
-            if isinstance(m, nn.Linear):
+            if isinstance(m, (nn.Linear,nn.Conv2d)):
                 nn.init.kaiming_uniform_(m.weight, a=0, mode='fan_in', nonlinearity='leaky_relu')
                 if m.bias is not None:
                     nn.init.zeros_(m.bias)
@@ -144,7 +144,7 @@ class CNNGH(nn.Module):
 
         def _init_weights(self):
             for m in self.modules():
-                if isinstance(m, nn.Linear):
+               if isinstance(m, (nn.Linear,nn.Conv2d)):
                     nn.init.kaiming_uniform_(m.weight, a=0, mode='fan_in', nonlinearity='leaky_relu')
                     if m.bias is not None:
                         nn.init.zeros_(m.bias)
