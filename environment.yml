@@ -12,12 +12,10 @@ dependencies:
 - pip
 - pip:
   - torchvision
-  - onnx
   - wandb
   - onnxruntime
   - ipykernel
   - librosa
   - pandas
-  - ast
-  - keras
   - seaborn
+  - scikit-learn
