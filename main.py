@@ -75,6 +75,9 @@ if __name__ == "__main__":
         for epoch in range(1, epochs + 1):
             loss_train_epoch = train(model, device, train_dataloader, optimizer, loss, epoch)
             loss_test_epoch, prediction = test(model, device, test_dataloader, loss)
+
+        PATH="./modelsguardats/" + model.name
+        torch.save(model.state_dict(), PATH)
         #config = dict(
         #   epochs=5,
         #  classes=10,
