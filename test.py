@@ -10,7 +10,7 @@ def test(model, device, test_loader, criterion):
     with torch.no_grad():
         for batch_idx, (data, target) in t: #iterem sobre les dades
             data, target = data.to(device), target.to(device)
-            data = data.resize_(data.size()[0], 64, 64).float() #redimensió de les dades
+            #data = data.resize_(data.size()[0], 64, 64).float() #redimensió de les dades
             output = model(data)
             loss = criterion(output, target)
             losses.append(loss.item())
