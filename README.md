@@ -9,6 +9,13 @@ Data: Metadata and extracted features (342MB), 8,000 tracks in 8 genres (7 GB)
 Write here a short summary about your project. The text must include a short introduction and the targeted goals
 
 ## Code structure
+1. models.py : es defineixen varies arquitectures de xarxes neuronals usant 'torch.nn'. Aquesta consta de sis classes.
+2. utils.py : és una col·lecció de funcions i classes que realitzen diverses tasques relacionades amb el processament de dades per un model de classificació de gèneres de música usant espectogrames d'audio.
+3. download_data.sh : crea un directori anomenat "data" si no existeix, descarrega i extreu dos fitxers zip ("fma_metadata.zip" i "fma_small.zip") d'una URL proporcionada i realitza altres operacions per organitzar els fitxers descarregats dins del directori "data".
+4. environment.yml : arxiu de configuració en YAML que descriu un entorn conda amb el nom "xnap-example".
+5. main.py : realitza el procés d'entrenament i prova d'un model de xarxa neuronal convolucional per a la classificació de gèneres musicals utilitzant dades d'espectrogrames. També utilitza la plataforma WandB per al seguiment i la visualització.
+6. train.py : defineix un procés d'entrenament per a un model de xarxa neuronal, calcula les pèrdues per a cada lot d'entrenament i les registra en el registre de WandB per al seguiment i la visualització.
+
 You must create as many folders as you consider. You can use the proposed structure or replace it by the one in the base code that you use as starting point. Do not forget to add Markdown files as needed to explain well the code and how to use it.
 
 ## Example Code

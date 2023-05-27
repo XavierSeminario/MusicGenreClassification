@@ -22,7 +22,7 @@ else
     #echo "ade154f733639d52e35e32f5593efe5be76c6d70  fma_small.zip"    | sha1sum -c -
 
     7z e fma_small.zip
-    rm README.txt
-    rm checksums
-    rm fma_fmall.zip
+    rm -rf README.txt
+    rm -rf checksums
+    rm -rf fma_small.zip
 fi
