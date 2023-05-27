@@ -213,3 +213,50 @@ def init_weights(self):
                 nn.init.kaiming_uniform_(m.weight, a=0, mode='fan_in', nonlinearity='leaky_relu')
                 if m.bias is not None:
                     nn.init.zeros_(m.bias)
+                    
+                    
+ #LeNet
+class LeNet(nn.Module):
+    def __init__(self):
+        super(LeNet, self).__init__()
+
+        self.conv1 = nn.Conv2d(1, 6, kernel_size=5)
+        self.relu1 = nn.ReLU(inplace=True)
+        self.avgpool1 = nn.AvgPool2d(kernel_size=2)
+
+        self.conv2 = nn.Conv2d(6, 16, kernel_size=5)
+        self.relu2 = nn.ReLU(inplace=True)
+        self.avgpool2 = nn.AvgPool2d(kernel_size=2)
+
+        self.fc1 = nn.Linear(297888, 1291)
+        self.relu3 = nn.ReLU(inplace=True)
+        self.dropout = nn.Dropout(0.5)
+
+        self.fc2 = nn.Linear(1291, 84)
+        self.relu4 = nn.ReLU(inplace=True)
+
+        self.fc3 = nn.Linear(84, 8)
+
+    def forward(self, x):
+        x = x.unsqueeze(1)  # Add a channel dimension
+
+        out = self.conv1(x)
+        out = self.relu1(out)
+        out = self.avgpool1(out)
+
+        out = self.conv2(out)
+        out = self.relu2(out)
+        out = self.avgpool2(out)
+
+        out = out.view(out.size(0), -1)  # Flatten the tensor
+
+        out = self.fc1(out)
+        out = self.relu3(out)
+        out = self.dropout(out)
+
+        out = self.fc2(out)
+        out = self.relu4(out)
+
+        out = self.fc3(out)
+
+        return out
