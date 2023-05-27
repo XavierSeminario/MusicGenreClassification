@@ -267,7 +267,6 @@ class LeNet(nn.Module):
                 if m.bias is not None:
                     nn.init.zeros_(m.bias)
 
-<<<<<<< HEAD
 class ResBlock2d(nn.Module):
     def __init__(self, in_channels, out_channels):
         super().__init__()
