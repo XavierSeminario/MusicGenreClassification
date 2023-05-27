@@ -6,7 +6,9 @@ Tipus de model: CNN i RNN.
 Tasca: Classificació d'àudio.
 Dades: Metadata (342MB), 8.000 cançons de 8 generes diferents (7 GB).
 
-![image](https://github.com/DCC-UAB/xnap-project-matcad_grup_11/assets/120672702/e0664649-d61c-47c5-ab32-ec39c022d782)
+<p align="center">
+<img src="https://github.com/DCC-UAB/xnap-project-matcad_grup_11/assets/120672702/e0664649-d61c-47c5-ab32-ec39c022d782", widht="300", height="300">
+</p>
 
 ## Estructura del codi
 1. models.py : Es defineixen varies arquitectures de xarxes neuronals usant 'torch.nn'. Aquesta consta de tres classes.
