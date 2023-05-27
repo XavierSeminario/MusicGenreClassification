@@ -24,7 +24,7 @@ torch.cuda.manual_seed_all(hash("so runs are repeatable") % 2**32 - 1)
 # Device configuration
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-epochs = 100
+epochs = 300
 batch_size = 100        # number of samples during training
 test_batch_size = 50  # number of samples for test 
 train_size = 0.8
@@ -64,16 +64,17 @@ if __name__ == "__main__":
                                                                 train_kwargs, test_kwargs, False)
         
         print("Creacion Modelo")
-        model = CNNGH1D()
+        model = LeNet()
         model.apply(init_weights)
         loss = nn.CrossEntropyLoss()
-        optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+        optimizer = torch.optim.Adam(model.parameters(), lr=0.003)
         #Scheduler that will modify the learning ratio dinamically according to the test loss
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer)
         model.to(device)
         print("Inicio epochs")
 
         for epoch in range(1, epochs + 1):
+            print("Numero epoch:",epoch)
             loss_train_epoch = train(model, device, train_dataloader, optimizer, loss, epoch)
             loss_test_epoch, prediction = test(model, device, test_dataloader, loss)
         class_names =['Electronic','Experimental','Folk','Hip-Hop',
@@ -83,12 +84,3 @@ if __name__ == "__main__":
                         y_true=targets,class_names=class_names)})
         PATH="./modelsguardats/" + model.name
         torch.save(model.state_dict(), PATH)
-        #config = dict(
-        #   epochs=5,
-        #  classes=10,
-        # kernels=[16, 32],
-        # batch_size=128,
-        # learning_rate=5e-3,
-        # dataset="MNIST",
-        # architecture="CNN")
-        #model = model_pipeline(config)
