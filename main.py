@@ -13,6 +13,7 @@ from test import *
 from utils.utils import *
 from tqdm.auto import tqdm
 from models.models import *
+from models.models_utils import *
 
 # Ensure deterministic behavior
 torch.backends.cudnn.deterministic = True
@@ -24,11 +25,7 @@ torch.cuda.manual_seed_all(hash("so runs are repeatable") % 2**32 - 1)
 # Device configuration
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-<<<<<<< HEAD
 epochs = 5
-=======
-epochs = 100
->>>>>>> bd4ef1b6e511277d7c28cb43453aee2337d7c8d4
 batch_size = 100        # number of samples during training
 test_batch_size = 50  # number of samples for test 
 train_size = 0.8
@@ -61,6 +58,7 @@ if __name__ == "__main__":
             print("Epoch: ", epoch)
             loss_train_epoch = train(model, device, train_dataloader, optimizer, loss, epoch)
             loss_test_epoch, prediction = test(model, device, test_dataloader, loss)
+            scheduler.step()
         class_names =['Electronic','Experimental','Folk','Hip-Hop',
              'Instrumental', 'International', 'Pop', 'Rock']
         
