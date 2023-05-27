@@ -267,4 +267,62 @@ class LeNet(nn.Module):
                 if m.bias is not None:
                     nn.init.zeros_(m.bias)
 
-        
+
+class CNN64(nn.Module):
+    def __init__(self):
+        super(CNN64, self).__init__()
+
+        self.conv1 = nn.Conv2d(1, 6, kernel_size=5)
+        self.bn1 = nn.BatchNorm2d(6)
+        self.relu1 = nn.ReLU(inplace=True)
+        self.maxpool1 = nn.MaxPool2d(kernel_size=2)
+
+        self.conv2 = nn.Conv2d(6, 16, kernel_size=5)
+        self.bn2 = nn.BatchNorm2d(16)
+        self.relu2 = nn.ReLU(inplace=True)
+        self.maxpool2 = nn.MaxPool2d(kernel_size=2)
+
+        self.fc1 = nn.Linear(148016, 256)  # Reduce the number of neurons
+        self.bn3 = nn.BatchNorm1d(256)
+        self.relu3 = nn.ReLU(inplace=True)
+        self.dropout = nn.Dropout(0.5)
+
+        self.fc2 = nn.Linear(256, 64)  # Reduce the number of neurons
+        self.bn4 = nn.BatchNorm1d(64)
+        self.relu4 = nn.ReLU(inplace=True)
+
+        self.fc3 = nn.Linear(64, 8)
+
+    def forward(self, x):
+        x = x.unsqueeze(1)  # Add a channel dimension
+
+        out = self.conv1(x)
+        out = self.bn1(out)
+        out = self.relu1(out)
+        out = self.maxpool1(out)
+
+        out = self.conv2(out)
+        out = self.bn2(out)
+        out = self.relu2(out)
+        out = self.maxpool2(out)
+
+        out = out.view(out.size(0), -1)  # Flatten the tensor
+
+        out = self.fc1(out)
+        out = self.bn3(out)
+        out = self.relu3(out)
+        out = self.dropout(out)
+
+        out = self.fc2(out)
+        out = self.bn4(out)
+        out = self.relu4(out)
+
+        out = self.fc3(out)
+        return out
+
+    def init_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.Linear) or isinstance(m, nn.Conv2d):
+                nn.init.kaiming_uniform_(m.weight, a=0, mode='fan_in', nonlinearity='leaky_relu')
+                if m.bias is not None:
+                    nn.init.zeros_(m.bias)
