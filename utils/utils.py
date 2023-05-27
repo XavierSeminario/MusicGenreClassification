@@ -10,7 +10,9 @@ import tqdm
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 import seaborn as sns
+import ast
 import random
+
 # Number of samples per 30s audio clip.
 SAMPLING_RATE = 44100
 
@@ -79,8 +81,9 @@ def CreateSpectrograms(load_path,save_path, transformation = "MEL"): #  creates 
     #else:
      #   transform = torchaudio.transforms.Spectrogram(SAMPLING_RATE,n_fft=2048,hop_length=512)
     for file in list(load_path.iterdir()):
-        id_track = str(file)[18:-3]
-        
+        id_track = str(file)[-10:-4]
+        print(file)
+        print(id_track)
         try:
             waveform, sample_rate = librosa.load(file)
             spec = librosa.feature.melspectrogram(y=waveform, sr=sample_rate, n_fft = 2048,hop_length=512 )
@@ -162,6 +165,9 @@ def FixSpectrogramSize(spectrograms,genres,size): # reescale or cut spectograms 
 def FixSizeSpectrogram(spectrograms,genres,shapes):
     spectograms_list = []
     genres_list = []
+    height = shapes[0]
+
+
 
     for i,spec in enumerate(spectrograms):
         if spec.shape != (shapes[0],shapes[1]):
@@ -183,11 +189,22 @@ def LoadFixCSV():
 
     return tracks,genres
 
-def CreateTrainTestLoaders(spectrograms_list, genres_list, train_size, train_kwargs, test_kwargs, dataaugment = False):
+def CreateTrainTestLoaders(spectrograms_list, genres_list, train_size, train_kwargs, test_kwargs,dataaugment=False):
     #Faltaria afegir split de test i train 
+    train_mean = np.mean(spectrograms_list)/255. #Mean of all images
+    train_std = np.std(spectrograms_list)/255. 
     
+    #transform = transforms.Compose([
+        #transforms.Normalize((train_mean,), (train_std,))
+        #])
+
     X_train, X_val, y_train, y_val = train_test_split(spectrograms_list, genres_list, train_size=train_size, stratify=genres_list)
     
+    
+    if dataaugment:
+        DataSpecAugmentation(X_train, y_train)
+
+
     if dataaugment:
         DataSpecAugmentation(X_train, y_train)
 
@@ -221,7 +238,7 @@ def LoadDataPipeline():
     shape = []
     for i in spectrograms:
         shape.append(i.shape)
-    
+    #print(shape)
     shapes = np.unique(shape)
 
 

@@ -258,12 +258,13 @@ class LeNet(nn.Module):
         out = self.relu4(out)
 
         out = self.fc3(out)
-        
-   def init_weights(self):
+        return out
+    
+    def init_weights(self):
         for m in self.modules():
             if isinstance(m, nn.Linear) or isinstance(m, nn.Conv2d):
                 nn.init.kaiming_uniform_(m.weight, a=0, mode='fan_in', nonlinearity='leaky_relu')
                 if m.bias is not None:
                     nn.init.zeros_(m.bias)
 
-        return out
+        
