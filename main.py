@@ -25,9 +25,9 @@ torch.cuda.manual_seed_all(hash("so runs are repeatable") % 2**32 - 1)
 # Device configuration
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-epochs = 5
+epochs = 3
 batch_size = 100        # number of samples during training
-test_batch_size = 50  # number of samples for test 
+test_batch_size = 100  # number of samples for test 
 train_size = 0.8
 
 train_kwargs = {'batch_size': batch_size}
@@ -58,7 +58,7 @@ if __name__ == "__main__":
             print("Epoch: ", epoch)
             loss_train_epoch = train(model, device, train_dataloader, optimizer, loss, epoch)
             loss_test_epoch, prediction = test(model, device, test_dataloader, loss)
-            scheduler.step()
+            scheduler.step(loss_test_epoch)
         class_names =['Electronic','Experimental','Folk','Hip-Hop',
              'Instrumental', 'International', 'Pop', 'Rock']
         

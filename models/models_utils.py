@@ -1,7 +1,7 @@
 import torch.nn as nn
 import torch.nn.functional as F
 import torch
-import torchviz
+#import torchviz
 
 def init_weights(model, method = 'Kaiming'):
     """
@@ -35,7 +35,7 @@ def calcular_parametres_del_model(model):
     return pytorch_total_params
 
 
-def mostra_estructura_model_torchviz(model):
+#def mostra_estructura_model_torchviz(model):
     """
     Function that allows the visualization of the structure of the model as a diagram.
 
@@ -45,6 +45,6 @@ def mostra_estructura_model_torchviz(model):
     Return:
     - The model diagram.
     """
-    from torchviz import make_dot
-    test_input = torch.randn(1, 1, 28, 28)
-    return make_dot(model(test_input), params=dict(model.named_parameters()))
+    #from torchviz import make_dot
+    #test_input = torch.randn(1, 1, 28, 28)
+    #return make_dot(model(test_input), params=dict(model.named_parameters()))

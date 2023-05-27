@@ -102,6 +102,8 @@ class RNN(nn.Module):
     """
     def __init__(self):
         super().__init__()
+        self.name="RNN"
+
         self.conv_block = ConvBlock2d()
         self.lstm = nn.LSTM(input_size=128, hidden_size=128, batch_first=True)
         self.dropout = nn.Dropout(p=0.5)
@@ -129,6 +131,7 @@ class CNN64(nn.Module):
     """
     def __init__(self):
         super(CNN64, self).__init__()
+        self.name="CNN64"
 
         self.conv1 = nn.Conv2d(1, 6, kernel_size=5)
         self.bn1 = nn.BatchNorm2d(6)
