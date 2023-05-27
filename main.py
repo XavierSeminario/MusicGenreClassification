@@ -24,7 +24,7 @@ torch.cuda.manual_seed_all(hash("so runs are repeatable") % 2**32 - 1)
 # Device configuration
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-epochs = 50
+epochs = 100
 batch_size = 100        # number of samples during training
 test_batch_size = 50  # number of samples for test 
 train_size = 0.8
@@ -64,10 +64,10 @@ if __name__ == "__main__":
                                                                 train_kwargs, test_kwargs, False)
         
         print("Creacion Modelo")
-        model = CNNGH1D()
+        model = LeNet()
         model.apply(init_weights)
         loss = nn.CrossEntropyLoss()
-        optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+        optimizer = torch.optim.Adam(model.parameters(), lr=0.003)
         #Scheduler that will modify the learning ratio dinamically according to the test loss
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer)
         model.to(device)

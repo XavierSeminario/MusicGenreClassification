@@ -172,21 +172,21 @@ class CNNGH1D(nn.Module):
             self.name="CNNGH1D"
             self.layer1 = nn.Sequential(
                 nn.Conv1d(in_channels=128,out_channels=128, kernel_size=4),
-                nn.ReLU(inplace=True),
+                nn.LeakyReLU(inplace=True),
                 nn.Dropout(0.25),
                 nn.BatchNorm1d(128),
                 nn.MaxPool1d(4)
             )
             self.layer2 = nn.Sequential(
                 nn.Conv1d(in_channels=128, out_channels=128, kernel_size=4),
-                nn.ReLU(inplace=True),
+                nn.LeakyReLU(inplace=True),
                 nn.Dropout(0.25),
                 nn.BatchNorm1d(128),
                 nn.MaxPool1d(4)
             )
             self.layer3 = nn.Sequential(
                 nn.Conv1d(in_channels=128, out_channels=128, kernel_size=4),
-                nn.ReLU(inplace=True),
+                nn.LeakyReLU(inplace=True),
                 nn.Dropout(0.25),
                 nn.BatchNorm1d(128),
                 nn.MaxPool1d(2)
@@ -207,12 +207,7 @@ class CNNGH1D(nn.Module):
             out = self.dropout(out)
             return out
         
-def init_weights(self):
-        for m in self.modules():
-            if isinstance(m, nn.Linear) or isinstance(m, nn.Conv1d):
-                nn.init.kaiming_uniform_(m.weight, a=0, mode='fan_in', nonlinearity='leaky_relu')
-                if m.bias is not None:
-                    nn.init.zeros_(m.bias)
+
                     
                     
  #LeNet
@@ -259,11 +254,13 @@ class LeNet(nn.Module):
 
         out = self.fc3(out)
         
-   def init_weights(self):
-        for m in self.modules():
-            if isinstance(m, nn.Linear) or isinstance(m, nn.Conv2d):
-                nn.init.kaiming_uniform_(m.weight, a=0, mode='fan_in', nonlinearity='leaky_relu')
-                if m.bias is not None:
-                    nn.init.zeros_(m.bias)
-
         return out
+
+def init_weights(model):
+    for m in model.modules():
+        if isinstance(m, nn.Linear) or isinstance(m, nn.Conv2d) or isinstance(m, nn.Conv1d):
+            nn.init.kaiming_uniform_(m.weight, a=0, mode='fan_in', nonlinearity='leaky_relu')
+            if m.bias is not None:
+                nn.init.zeros_(m.bias)
+
+    
