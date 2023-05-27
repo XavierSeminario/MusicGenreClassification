@@ -6,6 +6,10 @@ import torch
 
     
 class CNNGH1D(nn.Module):
+        """
+        Convolutional Neural Network of 1 dimension, on the time dimension. It has 3 CNN layers with LeakyReLU activations and kernel of 4, and with
+        Max Pooling between them of 4,4 and 2 respectively. After the convolutions it has 1 FC layer.
+        """
         def __init__(self):
             super(CNNGH1D, self).__init__()
             self.name="CNNGH1D"
@@ -48,6 +52,9 @@ class CNNGH1D(nn.Module):
         
 
 class ResBlock2d(nn.Module):
+    """
+    Residual Convolutional Neural Networks, two CNN layers that are added during the activation function (ReLU).
+    """
     def __init__(self, in_channels, out_channels):
         super().__init__()
         self.layer1 = nn.Sequential(
@@ -69,6 +76,10 @@ class ResBlock2d(nn.Module):
 
 
 class ConvBlock2d(nn.Module):
+    """
+    Block of 4 Residual CNN, with channel (input,output) of (1,16), (16,32), (32,64) and (64,128) respectively, with Max Pooling between
+    them with kernel (8,2), (4,2) and (4,2)
+    """
     def __init__(self):
         super().__init__()
         self.block = nn.Sequential(
@@ -85,6 +96,10 @@ class ConvBlock2d(nn.Module):
         return self.block(x)
     
 class RNN(nn.Module):
+    """
+    Combination of Residual Convolutional Neural Network and Recurrent Neural Network, using 4 blocks of Residual Convolutions (ConvBlock2d), 1 LSTM layer and
+    1 FC layer.
+    """
     def __init__(self):
         super().__init__()
         self.conv_block = ConvBlock2d()
@@ -110,7 +125,7 @@ class RNN(nn.Module):
 
 class CNN64(nn.Module):
     """
-    2D Convolutional Neural Network model with 2 layers of convolutions
+    2D Convolutional Neural Network model with 2 layers of convolutions and 3 FC layers, 5 layers depth.
     """
     def __init__(self):
         super(CNN64, self).__init__()

@@ -13,6 +13,7 @@ from test import *
 from utils.utils import *
 from tqdm.auto import tqdm
 from models.models import *
+from models.models_utils import *
 
 # Ensure deterministic behavior
 torch.backends.cudnn.deterministic = True
@@ -34,24 +35,7 @@ test_kwargs = {'batch_size': test_batch_size}
 
 
 
-"""
-def model_pipeline(cfg:dict) -> None:
-    # tell wandb to get started
-    with wandb.init(project="pytorch-demo", config=cfg):
-      # access all HPs through wandb.config, so logging matches execution!
-      config = wandb.config
 
-      # make the model, data, and optimization problem
-      model, train_loader, test_loader, criterion, optimizer = make(config)
-
-      # and use them to train the model
-      train(model, train_loader, criterion, optimizer, config)
-
-      # and test its final performance
-      test(model, test_loader)
-
-    return model
-"""
 if __name__ == "__main__":
     os.system('./download_data.sh')
     wandb.login()
@@ -64,10 +48,10 @@ if __name__ == "__main__":
                                                                 train_kwargs, test_kwargs, False)
         
         print("Creacion Modelo")
-        model = LeNet()
+        model = CNNGH1D()
         model.apply(init_weights)
         loss = nn.CrossEntropyLoss()
-        optimizer = torch.optim.Adam(model.parameters(), lr=0.003)
+        optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
         #Scheduler that will modify the learning ratio dinamically according to the test loss
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer)
         model.to(device)
@@ -77,10 +61,14 @@ if __name__ == "__main__":
             print("Numero epoch:",epoch)
             loss_train_epoch = train(model, device, train_dataloader, optimizer, loss, epoch)
             loss_test_epoch, prediction = test(model, device, test_dataloader, loss)
+            scheduler.step()
+        
+        
         class_names =['Electronic','Experimental','Folk','Hip-Hop',
              'Instrumental', 'International', 'Pop', 'Rock']
-        
         wandb.log({"conf_mat" : wandb.plot.confusion_matrix(preds=prediction,
                         y_true=targets,class_names=class_names)})
+        
+
         PATH="./modelsguardats/" + model.name
         torch.save(model.state_dict(), PATH)

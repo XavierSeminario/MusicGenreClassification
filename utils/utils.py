@@ -18,28 +18,45 @@ SAMPLING_RATE = 44100
 
 
     
-def GetGenres(path,dict_genre,tracks ,genre_att = 'genre_top'):  #Returns two arrays, one with ID's the other with their genres
+def GetGenres(path,dict_genre,tracks):  #Returns two arrays, one with ID's the other with their genres
+    """
+    Finds the genre of each audio file through the id and the tracks dataset, and returns in order the list of ids and genres of each.
+    Also encodes the genres.
+
+    Parameters:
+    - path: Path where the audio files are located.
+    - dict_genre: Dictionary used to encode the genres from strings to ints.
+    - tracks: Tracks Dataset.
+
+    Return:
+    - id_list: Array containing the id of each song.
+    - genre_list: Array containing the genre of each song.
+    """
+
     id_list = []       
     genre_list = []                                
     for direc in list(path.iterdir()):
         if direc.is_file():
             id_track = str(direc)[-10:-4]
             id_list.append(id_track)
-            genre_list.append(dict_genre[tracks.loc[tracks.track_id == int(id_track),genre_att].values[0]])
+            genre_list.append(dict_genre[tracks.loc[tracks.track_id == int(id_track),'genre_top'].values[0]]) #Gets only the top genre
     return np.asarray(id_list),np.asarray(genre_list)
 
 
 
-def CreateSpectrograms(load_path,save_path, transformation = "MEL"): #  creates spectrograms from audio files and saves them as Torch tensors 
-    #if transformation == 'MEL':                                         # using either MelSpectrogram or Spectrogram transformation (default is MelSpectrogram)
+def CreateSpectrograms(load_path,save_path): 
+    """
+    Loads each song and creates the Mel Spectrogram of each using librosa, with Fast Fourier Transform window of 2048 and a 
+    hop length of 512. It also saves the spectrogram on the save defined path with the id as the name and it reduces the channel 
+    of the audio to one (mono and not stereo) when it has 2 channels.
 
-     #   transform = torchaudio.transforms.MelSpectrogram(SAMPLING_RATE,n_fft=2048,hop_length=512)
-    #else:
-     #   transform = torchaudio.transforms.Spectrogram(SAMPLING_RATE,n_fft=2048,hop_length=512)
+    Parameters:
+    - load_path: Path where the audios to load are found.
+    - save_path: Path where we the spectrograms are saved.
+    """
+
     for file in list(load_path.iterdir()):
         id_track = str(file)[-10:-4]
-        print(file)
-        print(id_track)
         try:
             waveform, sample_rate = librosa.load(file)
             spec = librosa.feature.melspectrogram(y=waveform, sr=sample_rate, n_fft = 2048,hop_length=512 )
@@ -51,11 +68,23 @@ def CreateSpectrograms(load_path,save_path, transformation = "MEL"): #  creates 
             pass
 
 def ChargeDataset(path,id_list,genre_list):
+    """
+    Loads the spectrograms and also the genres of each spectrogram created.
+
+    Parameters:
+    - path: Path where the spectrogram are found.
+    - id_list: List with the id of each track.
+    - genre_list: List with the genre of each track.
+
+    Return:
+    - images: List containing the spectrograms of each track.
+    - labels: List containing the genres of each track.
+    """
     images = []
     labels = []
     for i,spec in enumerate(list(path.iterdir())):
         id_track = str(spec)[18:-3]
-        labels.append(genre_list[np.argwhere(id_list == id_track)][0][0])
+        labels.append(genre_list[np.argwhere(id_list == id_track)][0][0]) #Finds the index of the id to get the genre
         
         spec = torch.load(spec)
         spec = np.asarray(librosa.power_to_db(spec))
@@ -64,18 +93,31 @@ def ChargeDataset(path,id_list,genre_list):
     return images,labels
 
 
-def plot_spectrogram(spec, title=None, ylabel="freq_bin", aspect="auto", xmax=None):
+def plot_spectrogram(spec, title=None, ylabel="freq_bin", xmax=None):
+    """
+    Allows to plot the spectrogram.
+
+    Parameters:
+    - spec: Spectrogram to plot.
+    - title: Title of the plot. None as default.
+    - ylabel: Label og the y axis. "freq_bin" as default.
+    - xmax: Max value of the x axis. None as default.
+    """
+
     fig, axs = plt.subplots(1, 1)
     axs.set_title(title or "Spectrogram (db)")
     axs.set_ylabel(ylabel)
     axs.set_xlabel("frame")
-    im = axs.imshow(librosa.power_to_db(spec), origin="lower", aspect=aspect)
+    im = axs.imshow(spec, origin="lower", aspect="auto")
     if xmax:
         axs.set_xlim((0, xmax))
     fig.colorbar(im, ax=axs)
-   # plt.show(block=False)
+    plt.show(block=False)
 
 class CustomSpectrogramDataset(Dataset):
+    """
+    Class used to create the dataset of the Spectrograms for the PyTorch models.
+    """
     def __init__(self, spectrogram,genre, transform=None):
         self.x = spectrogram
         self.target = genre
@@ -91,39 +133,21 @@ class CustomSpectrogramDataset(Dataset):
             image = self.transform(image)
         return image, label
 
-def FixSpectrogramSize(spectrograms,genres,size): # reescale or cut spectograms so that they are all the same size
-    spectograms_list = []
-    genres_list = []
-    for i,spec in enumerate(spectrograms):
-        if spec.shape == (128,2812):
-            spectograms_list.append(spec[0:128,0:size])
-            genres_list.append(genres[i])
-            
-        elif spec.shape == (1,128,size):
-            spectograms_list.append(spec.reshape(128,size))
-            genres_list.append(genres[i])
-
-        elif spec.shape == (1,128,2585):
-            spec = spec.reshape(128,2585)
-            spectograms_list.append(spec[0:128,0:size])
-            genres_list.append(genres[i])
-
-        elif spec.shape == (128, 2585):
-            spectograms_list.append(spec[0:128,0:size])
-            genres_list.append(genres[i])
-
-        elif spec.shape == (128, size):
-            spectograms_list.append(spec)
-            genres_list.append(genres[i])
-    
-    return spectograms_list, genres_list
 
 def FixSizeSpectrogram(spectrograms,genres,shapes):
+    """
+    Fixes the size of all spectrograms, making them all of the same size so convolutions can be done.
+
+    Parameters:
+    - spectrograms: List containing all the spectrograms.
+    - genres: List containing all the genres associated to the spectrograms.
+    - shapes: Array with all the shapes found. First value corresponds to the height (frequency), which is equal for all 
+              spectrograms, and second corresponds to the smallest value of the width (time), which will be the new value for all of them.
+
+    Returns: 
+    """
     spectograms_list = []
     genres_list = []
-    height = shapes[0]
-
-
 
     for i,spec in enumerate(spectrograms):
         if spec.shape != (shapes[0],shapes[1]):
@@ -240,13 +264,3 @@ def spec_augment(spec: np.ndarray, num_mask=2,
         spec[t0:t0 + num_frames_to_mask, :] = 0
     
     return spec
-
-def visualize_confusion_matrix(y_pred, y_real):
-    #mostra la matriu de confusió
-    cm = confusion_matrix(y_real, y_pred)
-    plt.subplots(figsize=(10, 6))
-    sns.heatmap(cm, annot = True, fmt = 'g')
-    plt.xlabel("Predicted")
-    plt.ylabel("Actual")
-    plt.title("Confusion Matrix")
-    plt.show()
