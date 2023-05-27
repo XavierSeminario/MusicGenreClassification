@@ -26,50 +26,6 @@ def GetGenres(path,dict_genre,tracks ,genre_att = 'genre_top'):  #Returns two ar
             genre_list.append(dict_genre[tracks.loc[tracks.track_id == int(id_track),genre_att].values[0]])
     return np.asarray(id_list),np.asarray(genre_list)
 
-def load(filepath): #loads CSV file from the specified filepath and performs different operations based on the filename
-
-    filename = os.path.basename(filepath)
-
-    if 'features' in filename:
-        return pd.read_csv(filepath, index_col=0, header=[0, 1, 2])
-                                            #if it contains 'features' or 'echonest', it reads the CSV file with specific headers
-    if 'echonest' in filename:
-        return pd.read_csv(filepath, index_col=0, header=[0, 1, 2])
-
-    if 'genres' in filename: #if it contains 'genres', it reads the CSV file with a basic index column
-        return pd.read_csv(filepath, index_col=0)
-
-    if 'tracks' in filename: #if it contains 'tracks', it reads the CSV file with multiple headers and performs additional data transformations before returning the loaded data
-        tracks = pd.read_csv(filepath, index_col=0, header=[0, 1])
-
-        COLUMNS = [('track', 'tags'), ('album', 'tags'), ('artist', 'tags'),
-                   ('track', 'genres'), ('track', 'genres_all')]
-        for column in COLUMNS:
-            tracks[column] = tracks[column].map(ast.literal_eval)
-
-        COLUMNS = [('track', 'date_created'), ('track', 'date_recorded'),
-                   ('album', 'date_created'), ('album', 'date_released'),
-                   ('artist', 'date_created'), ('artist', 'active_year_begin'),
-                   ('artist', 'active_year_end')]
-        for column in COLUMNS:
-            tracks[column] = pd.to_datetime(tracks[column])
-
-        SUBSETS = ('small', 'medium', 'large')
-        try:
-            tracks['set', 'subset'] = tracks['set', 'subset'].astype(
-                    'category', categories=SUBSETS, ordered=True)
-        except (ValueError, TypeError):
-            # the categories and ordered arguments were removed in pandas 0.25
-            tracks['set', 'subset'] = tracks['set', 'subset'].astype(
-                     pd.CategoricalDtype(categories=SUBSETS, ordered=True))
-
-        COLUMNS = [('track', 'genre_top'), ('track', 'license'),
-                   ('album', 'type'), ('album', 'information'),
-                   ('artist', 'bio')]
-        for column in COLUMNS:
-            tracks[column] = tracks[column].astype('category')
-
-        return tracks
 
 
 def CreateSpectrograms(load_path,save_path, transformation = "MEL"): #  creates spectrograms from audio files and saves them as Torch tensors 

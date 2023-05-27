@@ -61,7 +61,7 @@ if __name__ == "__main__":
 
         
         train_dataloader,test_dataloader, targets = CreateTrainTestLoaders(spectrograms_list, genres_list, train_size, 
-                                                                train_kwargs, test_kwargs, True)
+                                                                train_kwargs, test_kwargs, False)
         
         print("Creacion Modelo")
         model = CNNGH1D()
@@ -74,6 +74,7 @@ if __name__ == "__main__":
         print("Inicio epochs")
 
         for epoch in range(1, epochs + 1):
+            print("Numero epoch:",epoch)
             loss_train_epoch = train(model, device, train_dataloader, optimizer, loss, epoch)
             loss_test_epoch, prediction = test(model, device, test_dataloader, loss)
         class_names =['Electronic','Experimental','Folk','Hip-Hop',
@@ -83,12 +84,3 @@ if __name__ == "__main__":
                         y_true=targets,class_names=class_names)})
         PATH="./modelsguardats/" + model.name
         torch.save(model.state_dict(), PATH)
-        #config = dict(
-        #   epochs=5,
-        #  classes=10,
-        # kernels=[16, 32],
-        # batch_size=128,
-        # learning_rate=5e-3,
-        # dataset="MNIST",
-        # architecture="CNN")
-        #model = model_pipeline(config)

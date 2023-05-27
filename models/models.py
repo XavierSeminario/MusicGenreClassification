@@ -172,21 +172,21 @@ class CNNGH1D(nn.Module):
             self.name="CNNGH1D"
             self.layer1 = nn.Sequential(
                 nn.Conv1d(in_channels=128,out_channels=128, kernel_size=4),
-                nn.LeakyReLU(inplace=True),
+                nn.ReLU(inplace=True),
                 nn.Dropout(0.25),
                 nn.BatchNorm1d(128),
                 nn.MaxPool1d(4)
             )
             self.layer2 = nn.Sequential(
                 nn.Conv1d(in_channels=128, out_channels=128, kernel_size=4),
-                nn.LeakyReLU(inplace=True),
+                nn.ReLU(inplace=True),
                 nn.Dropout(0.25),
                 nn.BatchNorm1d(128),
                 nn.MaxPool1d(4)
             )
             self.layer3 = nn.Sequential(
                 nn.Conv1d(in_channels=128, out_channels=128, kernel_size=4),
-                nn.LeakyReLU(inplace=True),
+                nn.ReLU(inplace=True),
                 nn.Dropout(0.25),
                 nn.BatchNorm1d(128),
                 nn.MaxPool1d(2)
