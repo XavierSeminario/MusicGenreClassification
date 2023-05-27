@@ -43,7 +43,7 @@ def mostra_estructura_model_torchviz(model):
     - model: model whose structure we want to evaluate.
 
     Return:
-    - The model diagram
+    - The model diagram.
     """
     from torchviz import make_dot
     test_input = torch.randn(1, 1, 28, 28)

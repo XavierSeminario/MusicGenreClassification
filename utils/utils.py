@@ -2,23 +2,20 @@ import numpy as np
 import pandas as pd
 import os.path
 import torch
-from pathlib import Path,PureWindowsPath,PurePosixPath
+from pathlib import Path
 import matplotlib.pyplot as plt
 import librosa
 from torch.utils.data.dataloader import DataLoader, Dataset
 import tqdm
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix
-import seaborn as sns
-import ast
 import random
 
-# Number of samples per 30s audio clip.
+# Sampling Rate per 30s audio clip.
 SAMPLING_RATE = 44100
 
 
     
-def GetGenres(path,dict_genre,tracks):  #Returns two arrays, one with ID's the other with their genres
+def GetGenres(path,dict_genre,tracks):  
     """
     Finds the genre of each audio file through the id and the tracks dataset, and returns in order the list of ids and genres of each.
     Also encodes the genres.
@@ -145,7 +142,10 @@ def FixSizeSpectrogram(spectrograms,genres,shapes):
               spectrograms, and second corresponds to the smallest value of the width (time), which will be the new value for all of them.
 
     Returns: 
+    - spectrograms_list: List containing all the spectrograms with the same size.
+    - genres_list: List containing all the genres associated to the spectrograms.
     """
+
     spectograms_list = []
     genres_list = []
 
@@ -160,6 +160,9 @@ def FixSizeSpectrogram(spectrograms,genres,shapes):
     return spectograms_list, genres_list
 
 def LoadFixCSV():
+    """
+    Loads the tracks and genres csv files, and fixes the headers of the tracks dataset so id readable.
+    """
     tracks = pd.read_csv("./data/tracks.csv", low_memory=False)
     genres = pd.read_csv("./data/genres.csv")
     tracks.columns=tracks.iloc[0] 
@@ -170,21 +173,26 @@ def LoadFixCSV():
     return tracks,genres
 
 def CreateTrainTestLoaders(spectrograms_list, genres_list, train_size, train_kwargs, test_kwargs,dataaugment=False):
-    #Faltaria afegir split de test i train 
-    train_mean = np.mean(spectrograms_list)/255. #Mean of all images
-    train_std = np.std(spectrograms_list)/255. 
-    
-    #transform = transforms.Compose([
-        #transforms.Normalize((train_mean,), (train_std,))
-        #])
+    """
+    Splits the data into train and test sets, and creathe the datasets and the train and test dataloader.
+
+    Parameters:
+    - spectrograms_list: List containing all the spectrograms.
+    - genres_list: List containing all the genres associated to the spectrograms.
+    - train_size: Size of the training set (test set is 1-train_size). Float between 0 and 1.
+    - train_kwargs: Dictionary containing the parameters for the train dataloader. Contains the training batch size.
+    - test_kwargs: Dictionary containing the parameters for the test dataloader. Contains the test batch size.
+    - dataaugment: Boolean that controls if data augmentation with SpecAugm is performed in the train set. Default value is False.
+
+    Return:
+    - train_dataloader: Data Loader for the training set.
+    - test_dataloader: Data Loader for the test set.
+    - y_val: List containing the genres of the test set (returned so metrics can be performed).
+
+    """
 
     X_train, X_val, y_train, y_val = train_test_split(spectrograms_list, genres_list, train_size=train_size, stratify=genres_list)
     
-    
-    if dataaugment:
-        DataSpecAugmentation(X_train, y_train)
-
-
     if dataaugment:
         DataSpecAugmentation(X_train, y_train)
 
@@ -195,14 +203,22 @@ def CreateTrainTestLoaders(spectrograms_list, genres_list, train_size, train_kwa
     test_dataloader = torch.utils.data.DataLoader(test_ds, **test_kwargs)
 
 
-    return train_dataloader, test_dataloader, y_val #i tambe el test_dataloader
+    return train_dataloader, test_dataloader, y_val
 
 
 def LoadDataPipeline():
-    
+    """
+    Pipeline that reads the csv files, the audio files, encodes the genres, creates the spectrograms if they are not created yet, 
+    loads them and fixes the size of them. 
+
+    Returns:
+    - spectrograms_list: List containing all the spectrograms for the training and testing.
+    - genres_list: List containing all the genres of the spectrograms for the training and testing.
+    """
 
     tracks, genres = LoadFixCSV()
     print("Tracks and Genres loaded")
+
     genre_dict = {'Electronic':0,'Experimental':1,'Folk':2,'Hip-Hop':3,
              'Instrumental':4, 'International':5, 'Pop':6, 'Rock':7}
 
@@ -218,7 +234,6 @@ def LoadDataPipeline():
     shape = []
     for i in spectrograms:
         shape.append(i.shape)
-    #print(shape)
     shapes = np.unique(shape)
 
 
@@ -230,6 +245,17 @@ def LoadDataPipeline():
 
 
 def DataSpecAugmentation(spec_list, genres_list):
+    """
+    Performs Data Augmentation on a certaint set of spectrograms.
+
+    Parameters:
+    - spec_list: List of spectrograms.
+    - genres_list: List containing the genres associated to the spectrograms.
+
+    Returns:
+    - spec_list: List of spectrograms extended with the spectrograms created through SpecAugm.
+    - genres_list: List containing the genres associated to the extended spectrograms.
+    """
     new_spec = []
     genre_augment = []
 
@@ -245,6 +271,18 @@ def DataSpecAugmentation(spec_list, genres_list):
 #https://www.kaggle.com/code/davids1992/specaugment-quick-implementation
 def spec_augment(spec: np.ndarray, num_mask=2, 
                  freq_masking_max_percentage=0.15, time_masking_max_percentage=0.25):
+    """
+    Performs SpecAugm on the spectrogram passed. It performs it on the frequency axis and time axis, and does it randomly.
+
+    Parameters:
+    - spec: Array containing the spectrogram.
+    - num_mask: Number of masks applied on each axis. Integer.
+    - freq_masking_max_percentage: Maximum percentage the mask can cover on the frequency axis. Between 0 and 1.
+    - time_masking_max_percentage: Maximum percentage the mask can cover on the time axis. Between 0 and 1.
+
+    Returns:
+    - spec: Array of the new spectrogram created with the masks applied on it.
+    """
 
     spec = spec.copy()
     for i in range(num_mask):
