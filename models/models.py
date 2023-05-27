@@ -267,4 +267,62 @@ class LeNet(nn.Module):
                 if m.bias is not None:
                     nn.init.zeros_(m.bias)
 
-        
+class ResBlock2d(nn.Module):
+    def __init__(self, in_channels, out_channels):
+        super().__init__()
+        self.layer1 = nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(out_channels, out_channels, kernel_size=3, padding=1),
+            nn.BatchNorm2d(out_channels)
+        )        
+        self.layer2 = nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, kernel_size=1), 
+            nn.BatchNorm2d(out_channels)
+        )
+    
+        self.relu = nn.ReLU(inplace=True)
+
+    def forward(self, x):
+        return self.relu(self.layer1(x) + self.layer2(x))
+
+
+class ConvBlock2d(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.block = nn.Sequential(
+            ResBlock2d(1,16),
+            nn.MaxPool2d(kernel_size=[8,2]),
+            ResBlock2d(16,32),
+            nn.MaxPool2d(kernel_size=[4,2]),
+            ResBlock2d(32,64),
+            nn.MaxPool2d(kernel_size=[4,2]),
+            ResBlock2d(64,128)
+        )
+
+    def forward(self, x):
+        return self.block(x)
+    
+class RNN(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv_block = ConvBlock2d()
+        self.lstm = nn.LSTM(input_size=128, hidden_size=128, batch_first=True)
+        self.dropout = nn.Dropout(p=0.5)
+        self.fc1 = nn.Linear(128,8)
+
+    def forward(self,x):
+        x = x.unsqueeze(1)
+        x = self.conv_block(x)
+        x = x.reshape((x.shape[0], x.shape[3], x.shape[1]))
+        out, _ = self.lstm(x)
+        out = self.dropout(out[:,-1,:])
+        return self.fc1(out)
+    
+    def init_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.Linear) or isinstance(m, nn.Conv2d):
+                nn.init.kaiming_uniform_(m.weight, a=0, mode='fan_in', nonlinearity='leaky_relu')
+                if m.bias is not None:
+                    nn.init.zeros_(m.bias)      
