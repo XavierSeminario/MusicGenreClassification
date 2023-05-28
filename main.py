@@ -1,6 +1,7 @@
 import os
 import random
 import wandb
+import time
 
 import numpy as np
 import torch
@@ -25,18 +26,21 @@ torch.cuda.manual_seed_all(hash("so runs are repeatable") % 2**32 - 1)
 # Device configuration
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-epochs = 5
+epochs = 1
 batch_size = 100        # number of samples during training
-test_batch_size = 50  # number of samples for test 
+test_batch_size = 100  # number of samples for test 
 train_size = 0.8
 
 train_kwargs = {'batch_size': batch_size}
 test_kwargs = {'batch_size': test_batch_size}
 
 if __name__ == "__main__":
+    """
+    Overall, this script performs the following steps: data loading, model initialization, training loop, evaluation, logging, and model saving.
+    """
     os.system('./download_data.sh')
     wandb.login()
-    with wandb.init(project="MusicGenreClassification"):
+    with wandb.init(project="MusicGenreClassificationDefinitive"):
 
         spectrograms_list, genres_list = LoadDataPipeline()
         
@@ -45,6 +49,7 @@ if __name__ == "__main__":
         
         print("Initializing model")
         model = RNN()
+        print("Paràmetes model RNN:",calcular_parametres_del_model(model))
         model.apply(init_weights)
         loss = nn.CrossEntropyLoss()
         optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
@@ -57,11 +62,14 @@ if __name__ == "__main__":
         for epoch in range(1, epochs + 1):
             print("Epoch: ", epoch)
             loss_train_epoch = train(model, device, train_dataloader, optimizer, loss, epoch)
-            loss_test_epoch, prediction = test(model, device, test_dataloader, loss)
-            scheduler.step()
+            loss_test_epoch, prediction, probas = test(model, device, test_dataloader, loss)
+            scheduler.step(loss_test_epoch)
+
+        
         class_names =['Electronic','Experimental','Folk','Hip-Hop',
              'Instrumental', 'International', 'Pop', 'Rock']
         
+        plot_roc_curve(targets, probas, class_names)
         wandb.log({"conf_mat" : wandb.plot.confusion_matrix(preds=prediction,
                         y_true=targets,class_names=class_names)})
         PATH="./modelsguardats/" + model.name

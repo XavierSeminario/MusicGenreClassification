@@ -48,7 +48,7 @@ class CNNGH1D(nn.Module):
             out = self.fc1(out)
             out = F.relu(out)
             out = self.dropout(out)
-            return out
+            return out, F.softmax(out, dim=1)
         
 
 class ResBlock2d(nn.Module):
@@ -102,6 +102,8 @@ class RNN(nn.Module):
     """
     def __init__(self):
         super().__init__()
+        self.name="RNN"
+
         self.conv_block = ConvBlock2d()
         self.lstm = nn.LSTM(input_size=128, hidden_size=128, batch_first=True)
         self.dropout = nn.Dropout(p=0.5)
@@ -113,7 +115,8 @@ class RNN(nn.Module):
         x = x.reshape((x.shape[0], x.shape[3], x.shape[1]))
         out, _ = self.lstm(x)
         out = self.dropout(out[:,-1,:])
-        return self.fc1(out)
+        output = self.fc1(out)
+        return output, F.softmax(output, dim=1)
     
     def init_weights(self):
         for m in self.modules():
@@ -129,6 +132,7 @@ class CNN64(nn.Module):
     """
     def __init__(self):
         super(CNN64, self).__init__()
+        self.name="CNN64"
 
         self.conv1 = nn.Conv2d(1, 6, kernel_size=5)
         self.bn1 = nn.BatchNorm2d(6)
@@ -176,5 +180,5 @@ class CNN64(nn.Module):
         out = self.relu4(out)
 
         out = self.fc3(out)
-        return out
+        return out,F.softmax(out, dim=1)
 

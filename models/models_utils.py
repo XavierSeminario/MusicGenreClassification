@@ -1,7 +1,11 @@
 import torch.nn as nn
 import torch.nn.functional as F
 import torch
-import torchviz
+from sklearn.metrics import roc_curve
+import numpy as np
+import wandb
+import matplotlib.pyplot as plt
+
 
 def init_weights(model, method = 'Kaiming'):
     """
@@ -37,17 +41,33 @@ def calcular_parametres_del_model(model):
     return pytorch_total_params
 
 
-def mostra_estructura_model_torchviz(model):
+
+def plot_roc_curve(targets, probas, class_names):
     """
-    Function that allows the visualization of the structure of the model as a diagram.
+    Plots the roc curve and logs it to wandb.
 
     Parameters:
-    - model: Model whose structure we want to evaluate.
-
-    Return:
-    - The model diagram.
+    - targets: List containing the ground truth of the genres.
+    - probas: List containing the probabilities of predicting each genre for each spectrogram.
+    - class_names: List containing the class names.
     """
-    
-    from torchviz import make_dot
-    test_input = torch.randn(1, 1, 28, 28)
-    return make_dot(model(test_input), params=dict(model.named_parameters()))
+    y_true = np.array(targets)
+    y_probas = np.array(probas)
+    fpr = dict()
+    tpr = dict()
+
+    for i in range(8):
+        fpr[i], tpr[i], _ = roc_curve(y_true,y_probas[...,i], pos_label = i)
+
+        plt.plot(fpr[i], tpr[i], lw=2, label=class_names[i])
+
+
+    plt.xlabel("recall")
+    plt.ylabel("precision")
+    plt.legend(loc="best")
+    plt.title("precision vs. recall curve")
+    wandb.init(project="MusicGenreClassification")
+
+    wandb.log({"chart": plt})
+
+
