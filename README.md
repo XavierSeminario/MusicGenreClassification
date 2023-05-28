@@ -11,7 +11,7 @@ El projecte en el qual s'ha treballat té com a tasca principal la classificaci�
 Pel que fa a les dades, es disposa de metadades que ocupen aproximadament 342MB i inclouen informació com el títol de la cançó, l'artista, l'àlbum, etc. A més, hi ha 8.000 cançons de 8 gèneres diferents que ocupen al voltant de 7GB. Aquestes cançons seran fonamentals per entrenar i avaluar el model de classificació.
 
 <p align="center">
-<img src="/home/pau/Desktop/Tercer Curs/Segon Semestre/Xarxes/Projecte_Xarxes/IMG_20230307_230625460.jpg", widht="300", height="300">
+<img src="https://github.com/DCC-UAB/xnap-project-matcad_grup_11/blob/main/IMG_20230307_230625460.jpg", widht="300", height="300">
 </p>
 
 ## Estructura del codi
