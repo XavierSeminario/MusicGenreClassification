@@ -38,6 +38,9 @@ if __name__ == "__main__":
     Overall, this script performs the following steps: data loading, model initialization, training loop, evaluation, logging, and model saving.
     """
     os.system('./download_data.sh')
+    """
+    In order to disable WandB, comment both lines below, line 47 in test.py and lines 23, 64 in train.py
+    """
     wandb.login()
     with wandb.init(project="MusicGenreClassificationDefinitive"):
 
