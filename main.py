@@ -26,9 +26,9 @@ torch.cuda.manual_seed_all(hash("so runs are repeatable") % 2**32 - 1)
 # Device configuration
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-epochs = 1
-batch_size = 100        # number of samples during training
-test_batch_size = 100  # number of samples for test 
+epochs = 30
+batch_size = 50       # number of samples during training
+test_batch_size = 50  # number of samples for test 
 train_size = 0.8
 
 train_kwargs = {'batch_size': batch_size}
