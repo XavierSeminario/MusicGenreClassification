@@ -71,3 +71,31 @@ def plot_roc_curve(targets, probas, class_names):
     wandb.log({"chart": plt})
 
 
+def showImage(img, ax):
+    # convert the tensor to numpy
+    out = img.numpy()
+    # Bring to the 0-255 range
+    out = out - out.min()
+    out = out / out.max()
+    out = out * 255
+    out = out.astype('uint8')
+    # Plot image
+    ax.axes.get_xaxis().set_visible(False)
+    ax.axes.get_yaxis().set_visible(False)
+    ax.imshow(out, cmap='gray')
+
+def showConvMap(conv_map):
+    # Create a grid of images
+    h = conv_map.shape[0] # = number of images in the batch
+    w = conv_map.shape[1] # = number of activation maps per image
+    fig, ax = plt.subplots(h, w, figsize=(10, 10))
+
+    # Plot activation maps
+    for i in range(conv_map.shape[0]):
+        for j in range(conv_map.shape[1]):
+            showImage(conv_map[i][j], ax[i, j])
+
+    fig.tight_layout()
+def hook_ShowOutput(module, input, output):
+    print("Output shape:", output.shape)
+    showConvMap(output.cpu())
