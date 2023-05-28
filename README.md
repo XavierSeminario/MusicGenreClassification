@@ -3,7 +3,7 @@
 
 L'objectiu d'aquest projecte és classificar música en 163 gèneres diferents utilitzant atributs extrets o analitzant les pistes dels arxius MP3. Per aconseguir-ho, es farà servir una combinació de xarxes neuronals convolucionals (CNN) i xarxes neuronals recurrents (RNN).
 
-Els models de CNN són excel·lents per processar dades espacials com imatges i, en aquest cas, es poden utilitzar per extreure característiques de les pistes de música. Les capes de convolució de la CNN poden aprendre patrons locals en les dades d'àudio i, posteriorment, s'aplicaran capes totalment connectades per classificar les característiques extretes.
+Els models de CNN són excel·lents per processar dades espaials com imatges i, en aquest cas, es poden utilitzar per extreure característiques de les pistes de música. Les capes de convolució de la CNN poden aprendre patrons locals en les dades d'àudio i, posteriorment, s'aplicaran capes totalment connectades per classificar les característiques extretes.
 D'altra banda, les RNN són útils per processar seqüències de dades, com ara les representacions en temps de les pistes d'àudio. Les RNN són capaces de capturar dependències a llarg termini en les dades seqüencials, cosa que les fa adequades per a tasques de classificació d'àudio.
 
 El projecte en el qual s'ha treballat té com a tasca principal la classificació d'àudio.
@@ -16,10 +16,10 @@ Pel que fa a les dades, es disposa de metadades que ocupen aproximadament 342MB 
 
 ## Estructura del codi
 1. models.py : Es defineixen varies arquitectures de xarxes neuronals usant 'torch.nn'. Aquesta consta de tres classes.
-2. utils.py : És una col·lecció de funcions i classes que realitzen diverses tasques relacionades amb el processament de dades per un model de classificació de gèneres de música usant espectogrames d'audio.
+2. utils.py : És una col·lecció de funcions i classes que realitzen diverses tasques relacionades amb el processament de dades per un model de classificació de gèneres de música usant espectogrames d'àudio.
 3. download_data.sh : Crea un directori anomenat "data" si no existeix, descarrega i extreu dos fitxers zip ("fma_metadata.zip" i "fma_small.zip") d'una URL proporcionada i realitza altres operacions per organitzar els fitxers descarregats dins del directori "data".
 4. environment.yml : Arxiu de configuració en YAML que descriu un entorn conda amb el nom "xnap-example".
-5. main.py : Realitza el procés d'entrenament i prova d'un model de xarxa neuronal convolucional per a la classificació de gèneres musicals utilitzant dades d'espectrogrames. També utilitza la plataforma WandB per al seguiment i la visualització. Si no estàn ja creats, també utilitza funcions de utils.py per crear els espectrogrames.
+5. main.py : Realitza el procés d'entrenament i prova d'un model de xarxa neuronal convolucional per a la classificació de gèneres musicals utilitzant dades d'espectrogrames. També utilitza la plataforma WandB per al seguiment i la visualització. Si no estan ja creats, també utilitza funcions de utils.py per crear els espectrogrames.
 6. train.py : Defineix un procés d'entrenament per a un model de xarxa neuronal, calcula les pèrdues per a cada lot d'entrenament i les registra en el registre de WandB per al seguiment i la visualització.
 7. test.py : Defineix el procés de testeig per a un model de xarxa neuronal que es realitzarà a cada època, igual que en el fitxer train, es calculen les mètriques pertinents i es registren al WandB.
 
