@@ -15,7 +15,7 @@ def train(model, device, train_loader, optimizer, criterion, epoch):
     for batch_idx, (data, target) in t:
         data, target = data.to(device), target.to(device)
         optimizer.zero_grad() #backpropagation
-        output = model(data)
+        output, _ = model(data)
         loss = criterion(output, target)
         loss.backward()
 
@@ -27,7 +27,7 @@ def train(model, device, train_loader, optimizer, criterion, epoch):
         t.set_postfix(loss=loss.item())
 
         if ((batch_idx + 1) % 25) == 0:
-                train_log(loss, example_ct, epoch)
+               train_log(loss, example_ct, epoch)
 
     return np.mean(losses)
 

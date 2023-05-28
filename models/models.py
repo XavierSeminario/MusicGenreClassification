@@ -48,7 +48,7 @@ class CNNGH1D(nn.Module):
             out = self.fc1(out)
             out = F.relu(out)
             out = self.dropout(out)
-            return out
+            return out, F.softmax(out, dim=1)
         
 
 class ResBlock2d(nn.Module):
@@ -115,7 +115,8 @@ class RNN(nn.Module):
         x = x.reshape((x.shape[0], x.shape[3], x.shape[1]))
         out, _ = self.lstm(x)
         out = self.dropout(out[:,-1,:])
-        return self.fc1(out)
+        output = self.fc1(out)
+        return output, F.softmax(output, dim=1)
     
     def init_weights(self):
         for m in self.modules():
@@ -179,5 +180,5 @@ class CNN64(nn.Module):
         out = self.relu4(out)
 
         out = self.fc3(out)
-        return out
+        return out,F.softmax(out, dim=1)
 

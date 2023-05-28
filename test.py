@@ -3,19 +3,21 @@ import numpy as np
 import wandb
 import torch
 
-#comprovar si funciona ok, not sure
+
 def test(model, device, test_loader, criterion):
     losses = []
     model.eval()
     all_preds = []
-    
+    probas = []
+
     t = tqdm.tqdm(enumerate(test_loader), total=len(test_loader))
     t.set_description('Test')
     with torch.no_grad():
         correct, total = 0, 0
         for batch_idx, (data, target) in t: #iterem sobre les dades
             data, target = data.to(device), target.to(device)
-            output = model(data)
+            output, probs = model(data)
+            probas.extend(probs.detach().cpu().numpy())
             _, predicted = torch.max(output.data, 1)
             loss = criterion(output, target)
             losses.append(loss.item())
@@ -30,4 +32,4 @@ def test(model, device, test_loader, criterion):
         wandb.log({"test_accuracy": correct / total})
         
 
-    return np.mean(losses), all_preds
+    return np.mean(losses), all_preds, probas
