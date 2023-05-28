@@ -41,7 +41,9 @@ train_dataloader,test_dataloader, targets = CreateTrainTestLoaders(spectrograms_
 
 path_model = "./modelsguardats/CNN"
 
-model = torch.load(path_model, map_location='cpu')
+model = RNN()
+model.load_state_dict(torch.load(path_model))
+model.eval()
 
 loss_test_epoch, prediction, probas = test(model, device, test_dataloader, loss)
 
