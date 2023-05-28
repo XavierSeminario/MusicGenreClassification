@@ -166,6 +166,13 @@ def FixSizeSpectrogram(spectrograms,genres,shapes):
     return spectrograms_list, genres_list
 
 def LoadFixCSV():
+    """
+    Read data from csv files and prepare it adequately.
+
+    Returns:
+    - tracks: Dataframe containing information of each track.
+    - genres: Dataframe containing information of each genre.
+    """
     tracks = pd.read_csv("./data/tracks.csv", low_memory=False)
     genres = pd.read_csv("./data/genres.csv")
     tracks.columns=tracks.iloc[0] 
@@ -176,6 +183,22 @@ def LoadFixCSV():
     return tracks,genres
 
 def CreateTrainTestLoaders(spectrograms_list, genres_list, train_size, train_kwargs, test_kwargs,dataaugment=False):
+    """
+    Splits data into train/test sets, implements data augmentation (if desired) and creates both dataloaders.
+
+    Parameters:
+    - spectrograms_list: List containing the spectrograms of each track.
+    - genres_list: List containing the genres of each track.
+    - train_size: Percentage of the data that is dedicated to train.
+    - train_kwargs: Batch size of training set.
+    - test_kwargs: Batch size of test set.
+    - dataaugment: Decides if data augmentation is used or not, by default it is False.
+
+    Returns:
+    - train_dataloader: Dataloader of training set.
+    - test_dataloader: Dataloader of test set.
+    - y_val: List with the genres used for the test set.
+    """
     train_mean = np.mean(spectrograms_list)/255. #Mean of all images
     train_std = np.std(spectrograms_list)/255. 
 
@@ -195,6 +218,13 @@ def CreateTrainTestLoaders(spectrograms_list, genres_list, train_size, train_kwa
 
 
 def LoadDataPipeline():
+    """
+    Function used to Load the data and prepare it to create the dataloaders
+
+    Returns:
+    - spectrograms_list: List containing the spectrograms of each track.
+    - genres_list: List containing the genres of each track.
+    """
     tracks, genres = LoadFixCSV()
     print("Tracks and Genres loaded")
     genre_dict = {'Electronic':0,'Experimental':1,'Folk':2,'Hip-Hop':3,
@@ -223,6 +253,9 @@ def LoadDataPipeline():
 
 
 def DataSpecAugmentation(spec_list, genres_list):
+    """
+    Implement data augmentation to try to increase the performance of the model. 
+    """
     new_spec = []
     genre_augment = []
 
