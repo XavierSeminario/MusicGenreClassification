@@ -3,7 +3,20 @@ import numpy as np
 import wandb
 import torch
 
-#comprovar si funciona ok, not sure
+    """
+    Performs the evaluation of a trained model on a test dataset. 
+    
+    Parameters:
+    - model: This is the trained model that will be evaluated.
+    - device: The device (e.g., CPU or GPU) on which the evaluation will be performed.
+    - test_loader: A data loader that provides the test dataset in batches.
+    - criterion: The loss criterion used to calculate the loss between the model's predictions and the target labels.
+    
+    Returns:
+    - np.mean(losses): The mean of all the losses calculated during the evaluation.
+    - all_preds: A list that contains the predicted labels for all the test samples.
+    """
+
 def test(model, device, test_loader, criterion):
     losses = []
     model.eval()
