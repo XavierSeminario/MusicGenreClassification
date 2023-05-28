@@ -1,3 +1,9 @@
+"""
+Defines a Conda environment called "xnap-example" 
+that includes various dependencies for working with PyTorch, NumPy, tqdm, TensorBoard, Protocol Buffers, 
+and several other related libraries commonly used in machine learning and data analysis tasks.
+"""
+
 name: xnap-example
 channels:
 - pytorch
