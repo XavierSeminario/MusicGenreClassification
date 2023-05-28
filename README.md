@@ -1,10 +1,14 @@
 [![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-718a45dd9cf7e7f842a935f5ebbe5719a5e09af4491e668f4dbf3b35d5cca122.svg)](https://classroom.github.com/online_ide?assignment_repo_id=11101312&assignment_repo_type=AssignmentRepo)
 # Classificació de gèneres musicals Grup 11
 
-Objectiu: Classificar música en 163 gèneres, basat en atributs extrets o analitzant tracks d'arxius mp3.
-Tipus de model: CNN i RNN.
-Tasca: Classificació d'àudio.
-Dades: Metadata (342MB), 8.000 cançons de 8 generes diferents (7 GB).
+L'objectiu d'aquest projecte és classificar música en 163 gèneres diferents utilitzant atributs extrets o analitzant les pistes dels arxius MP3. Per aconseguir-ho, es farà servir una combinació de xarxes neuronals convolucionals (CNN) i xarxes neuronals recurrents (RNN).
+
+Els models de CNN són excel·lents per processar dades espacials com imatges i, en aquest cas, es poden utilitzar per extreure característiques de les pistes de música. Les capes de convolució de la CNN poden aprendre patrons locals en les dades d'àudio i, posteriorment, s'aplicaran capes totalment connectades per classificar les característiques extretes.
+D'altra banda, les RNN són útils per processar seqüències de dades, com ara les representacions en temps de les pistes d'àudio. Les RNN són capaces de capturar dependències a llarg termini en les dades seqüencials, cosa que les fa adequades per a tasques de classificació d'àudio.
+
+El projecte en el qual s'ha treballat té com a tasca principal la classificació d'àudio.
+
+Pel que fa a les dades, es disposa de metadades que ocupen aproximadament 342MB i inclouen informació com el títol de la cançó, l'artista, l'àlbum, etc. A més, hi ha 8.000 cançons de 8 gèneres diferents que ocupen al voltant de 7GB. Aquestes cançons seran fonamentals per entrenar i avaluar el model de classificació.
 
 <p align="center">
 <img src="https://github.com/DCC-UAB/xnap-project-matcad_grup_11/assets/120672702/e0664649-d61c-47c5-ab32-ec39c022d782", widht="300", height="300">

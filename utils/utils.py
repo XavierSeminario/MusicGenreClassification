@@ -166,6 +166,16 @@ def FixSizeSpectrogram(spectrograms,genres,shapes):
     return spectrograms_list, genres_list
 
 def LoadFixCSV():
+    """
+    Loads and preprocesses two CSV files, tracks.csv and genres.csv, and returns the resulting DataFrames tracks and genres.
+    
+    Parameters:
+    - None
+    
+    Returns:
+    - tracks: dataframe
+    - genres: dataframe
+    """
     tracks = pd.read_csv("./data/tracks.csv", low_memory=False)
     genres = pd.read_csv("./data/genres.csv")
     tracks.columns=tracks.iloc[0] 
@@ -176,6 +186,22 @@ def LoadFixCSV():
     return tracks,genres
 
 def CreateTrainTestLoaders(spectrograms_list, genres_list, train_size, train_kwargs, test_kwargs,dataaugment=False):
+    """
+    Used to create and prepare data loaders for training and testing a model. 
+    
+    Parameters:
+    - spectrograms_list: A list of spectrograms (input data) for each sample.
+    - genres_list: A list of corresponding genre labels for each sample.
+    - train_size: The proportion of data to be used for training (0.0 to 1.0).
+    - train_kwargs: Keyword arguments for configuring the training data loader.
+    - test_kwargs: Keyword arguments for configuring the testing data loader.
+    - dataaugment (optional): A boolean indicating whether to perform data augmentation. Default is False.
+    
+    Returns:
+    - train_dataloader: A PyTorch data loader for training data.
+    - test_dataloader: A PyTorch data loader for testing/validation data.
+    - y_val: The genre labels for the validation set.
+    """
     train_mean = np.mean(spectrograms_list)/255. #Mean of all images
     train_std = np.std(spectrograms_list)/255. 
 
@@ -195,6 +221,16 @@ def CreateTrainTestLoaders(spectrograms_list, genres_list, train_size, train_kwa
 
 
 def LoadDataPipeline():
+    """
+    Performs a pipeline of operations to load and process spectrogram data associated with tracks and genres, ensuring they are of fixed size.
+    
+    Parameters:
+    - None
+    
+    Returns:
+    - spectrograms_list: List containing the spectrograms of each track.
+    - genres_list: List containing the genres of each track.
+    """
     tracks, genres = LoadFixCSV()
     print("Tracks and Genres loaded")
     genre_dict = {'Electronic':0,'Experimental':1,'Folk':2,'Hip-Hop':3,
@@ -223,6 +259,16 @@ def LoadDataPipeline():
 
 
 def DataSpecAugmentation(spec_list, genres_list):
+    """
+    Performs data augmentation on a list of spectrograms and their corresponding genre labels.
+    
+    Parameters: 
+    - spec_list: A list of spectrograms to perform data augmentation on.
+    - genres_list: A list of genre labels corresponding to the spectrograms.
+    
+    Returns:
+    - None
+    """
     new_spec = []
     genre_augment = []
 
@@ -238,6 +284,20 @@ def DataSpecAugmentation(spec_list, genres_list):
 #https://www.kaggle.com/code/davids1992/specaugment-quick-implementation
 def spec_augment(spec: np.ndarray, num_mask=2, 
                  freq_masking_max_percentage=0.15, time_masking_max_percentage=0.25):
+    """
+    Applies random masks to a spectrogram by setting certain frequency and time regions to zero, 
+    thereby introducing variations and augmenting the data for training purposes, 
+    such as improving the robustness of models trained on the spectrograms.
+    
+    Parameters:
+    - spec: A numpy array representing a spectrogram.
+    - num_mask: The number of masks to apply to the spectrogram. Defaults to 2.
+    - freq_masking_max_percentage: The maximum percentage of frequencies to mask in each spectrogram. Defaults to 0.15.
+    - time_masking_max_percentage: The maximum percentage of time steps to mask in each spectrogram. Defaults to 0.25.
+    
+    Returns: 
+    - spec: The augmented spectrogram as a numpy array.
+    """
 
     spec = spec.copy()
     for i in range(num_mask):

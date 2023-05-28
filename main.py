@@ -35,6 +35,9 @@ train_kwargs = {'batch_size': batch_size}
 test_kwargs = {'batch_size': test_batch_size}
 
 if __name__ == "__main__":
+    """
+    Overall, this script performs the following steps: data loading, model initialization, training loop, evaluation, logging, and model saving.
+    """
     os.system('./download_data.sh')
     wandb.login()
     with wandb.init(project="MusicGenreClassificationDefinitive"):
