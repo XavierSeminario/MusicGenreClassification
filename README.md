@@ -23,6 +23,7 @@ Pel que fa a les dades, es disposa de metadades que ocupen aproximadament 342MB 
 6. main.py : Realitza el procés d'entrenament i prova d'un model de xarxa neuronal convolucional per a la classificació de gèneres musicals utilitzant dades d'espectrogrames. També utilitza la plataforma WandB per al seguiment i la visualització. Si no estan ja creats, també utilitza funcions de utils.py per crear els espectrogrames.
 7. train.py : Defineix un procés d'entrenament per a un model de xarxa neuronal, calcula les pèrdues per a cada lot d'entrenament i les registra en el registre de WandB per al seguiment i la visualització.
 8. test.py : Defineix el procés de testeig per a un model de xarxa neuronal que es realitzarà a cada època, igual que en el fitxer train, es calculen les mètriques pertinents i es registren al WandB.
+9. pre_trained_models : Carrega un model ja entrenat i realitza una predicció sobre les dades passades. Està pensat per ser utilitzat per dades no vistes (ni en el train ni en el test, d'altres cançons que com per exemple del "fma_medium.zip"). Per ara dona la predicció d'un set de test del dataset original, caldria descarregar un nou dataset i treballar amb ell. 
 
 Abans d'executar el codi cal crear un entorn local amb conda i activar-lo. El fitxer [environment.yml] conté totes les dependències necessàries per a poder executar el codi adequadament. Per activar-lo cal executar ``conda env create --file environment.yml``. També cal tenir instal·lat 7zip a l'ordinador ``sudo apt install p7zip-full p7zip-rar``.
 
@@ -46,11 +47,17 @@ python main.py
 | CRNN | 0.0001 | No | Yes | 20 | 3000 | 438,808 | 0.9 | 1.3 | 47% |
 
 
-## Metriques CRNN
+## Matrius de confusió
 
 Confusion CNN1D (Data Augmentation)
+<p align="center">
+<img src="https://cdn.discordapp.com/attachments/1107734165383823424/1112432536082202644/WB_Chart_28_5_2023_19_29_34.png", widht="300", height="300">
+</p>
 
 Confusion CRNN
+<p align="center">
+<img src="https://cdn.discordapp.com/attachments/1107734165383823424/1112424600576467055/WB_Chart_28_5_2023_18_58_00.png", widht="300", height="300">
+</p>
 
 ## Conclusions
 

@@ -54,7 +54,7 @@ if __name__ == "__main__":
         print("Paràmetes model RNN:",calcular_parametres_del_model(model))
         model.apply(init_weights)
         loss = nn.CrossEntropyLoss()
-        optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+        optimizer = torch.optim.Adam(model.parameters(), lr=0.001) #weight_decay = 1e-4
 
         #Scheduler that will modify the learning ratio dinamically according to the test loss
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer)
