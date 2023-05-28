@@ -57,6 +57,7 @@ Confusion CRNN
 <p align="center">
 <img src="https://cdn.discordapp.com/attachments/1107734165383823424/1112424600576467055/WB_Chart_28_5_2023_18_58_00.png", widht="300", height="300">
 </p>
+
 ## Conclusions
 
 La implementació de diferents models i l'utilització de diferents paràmetres ha permès observar com l'aprenentatge de les dades (els espectrogrames) es diferencia. Per una banda, s'ha pogut distingir que, tot i que la relació entre l'eix de les x i de les y en els espectogrames no és igual a la d'una imatge convencional, ja que les x representen el temps i les y la freqüència, s'obtenen millors resultats quan es tracten les dues dimensions per iguals (fent convolucions 2D) que no pas quan es tracten per separat (convolucions 1D). També s'ha observat que la introducció de capes recurrents (RNN) millora considerablement l'aprenentatge, sent el model CRNN el que obté millors resultats. Aquesta millora és raonable, ja que es tracte d'una sèrie temporal una canço, i la LSTM introduïda permet al model captar aquesta temporalitat.
