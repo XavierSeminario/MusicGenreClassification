@@ -23,6 +23,28 @@ torch.cuda.manual_seed_all(hash("so runs are repeatable") % 2**32 - 1)
 # Device configuration
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
+epochs = 30
+batch_size = 50        # number of samples during training
+test_batch_size = 50  # number of samples for test 
+train_size = 0.8
+
+train_kwargs = {'batch_size': batch_size}
+test_kwargs = {'batch_size': test_batch_size}
+loss = nn.CrossEntropyLoss()
+
+
+spectrograms_list, genres_list = LoadDataPipeline()
+
+train_dataloader,test_dataloader, targets = CreateTrainTestLoaders(spectrograms_list, genres_list, train_size, 
+                                                        train_kwargs, test_kwargs, False)
+
+
 path_model = "./modelsguardats/CNN"
 
 model = torch.load(path_model, map_location='cpu')
+
+loss_test_epoch, prediction, probas = test(model, device, test_dataloader, loss)
+
+print("Loss del model: ", loss_test_epoch)
+print("Prediccions: ", prediction)
+print("Probabilitats: ", probas)
