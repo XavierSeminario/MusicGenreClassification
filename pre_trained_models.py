@@ -32,21 +32,25 @@ train_kwargs = {'batch_size': batch_size}
 test_kwargs = {'batch_size': test_batch_size}
 loss = nn.CrossEntropyLoss()
 
+"""
+If you want to disable WandB, comment both lines below and
+line 47 in test.py.
+"""
+wandb.login()
+with wandb.init(project="MusicGenreClassificationDefinitive"):
 
-spectrograms_list, genres_list = LoadDataPipeline()
+    spectrograms_list, genres_list = LoadDataPipeline()
 
-train_dataloader,test_dataloader, targets = CreateTrainTestLoaders(spectrograms_list, genres_list, train_size, 
-                                                        train_kwargs, test_kwargs, False)
+    train_dataloader,test_dataloader, targets = CreateTrainTestLoaders(spectrograms_list, genres_list, train_size, 
+                                                            train_kwargs, test_kwargs, False)
 
 
-path_model = "./modelsguardats/CNN"
+    path_model = "./modelsguardats/CNNGH1D"
 
-model = RNN()
-model.load_state_dict(torch.load(path_model))
-model.eval()
+    model = CNNGH1D()
+    model.load_state_dict(torch.load(path_model, map_location="cpu"))
+    model.eval()
 
-loss_test_epoch, prediction, probas = test(model, device, test_dataloader, loss)
+    loss_test_epoch, prediction, probas = test(model, device, test_dataloader, loss)
 
-print("Loss del model: ", loss_test_epoch)
-print("Prediccions: ", prediction)
-print("Probabilitats: ", probas)
+    print("Loss del model: ", loss_test_epoch)
