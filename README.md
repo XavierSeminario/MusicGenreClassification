@@ -37,10 +37,10 @@ python main.py
 ```
 ## Resultats
 | Model | Initial LR | Data Augmentation | Weight Decay |Epochs | Time (s) | Nº Parameters | Train Loss | Test Loss | Accuracy |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | CNN1D | 0.01 | No | No | 30 | 900 | 236,680 | 1.50 | 1.85 | 33% |
 | CNN1D | 0.001 | Yes | Yes | 50 | 1200 | 236,680 | 1.3 | 1.55 | 47% |
-| CNN2D | 0.01 | No | No | 30 | 5180 | 236,680 | 1.7 | 0.5 | 49% |
+| CNN2D | 0.01 | No | No | 30 | 5180 | 37,912,576 | 1.7 | 0.1 | 49% |
 | CRNN | 0.01 | No | Yes | 30 | 6220 | 438,808 | 1.1 | 0.1 | 56% |
 
 ## Metriques CRNN
