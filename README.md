@@ -67,10 +67,10 @@ Cal destacar que l'ús de Data Augmentation i la introducció de paràmetres reg
 Pel que fa a les mètriques obtingudes amb el millor model, clarament s'observa que el model és capaç d'apendre. Depenent el model classifica millor un gènere o altre (i això podria portar a plantejar fer un ensemble de models) amb excepció del Pop.  Si es té present que el pop és un gènere pensat per a les masses, i agafa dels altres gèneres musicals, el problema en la seva classificació és prou raonable.   
 
 ## Contribuïdors
-- Manuel Arnau Fernández -> 1597487@uab.cat
+- Manuel Arnau Fernández -> manuel.arnauf@autonoma.cat
 - Pau Fuentes Hernández -> pau.fuentesh@autonoma.cat
 - Andrea González Aguilera -> andrea.gonzaleza@autonoma.cat
-- Xavier Seminario Monllaó -> 1603853@uab.cat
+- Xavier Seminario Monllaó -> xavier.seminario@autonoma.cat
 
 Xarxes Neuronals i Aprenentatge Profund
 Grau de Matemàtica Computacional i Analítica de Dades, 
